@@ -1,7 +1,10 @@
 ﻿using CsProjToVs2017Upgrader.Models;
 using ProjectUpgrader.SolutionReader;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace CsProjToVs2017Upgrader
@@ -71,15 +74,41 @@ namespace CsProjToVs2017Upgrader
                 var projInfo = projectReader.LoadProjectFile(path);
                 DisplayInfo(projInfo);
             }
-
-
-          
         }
 
         static void DisplayInfo(ProjectMeta meta)
         {
-            var line = $"{meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}]";
+            var filename = Path.GetFileName(meta.ProjectFilePath);
+
+            var line = $"{filename} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}]";
+            // get reference lists
+            var refListNotNuget = meta.ProjectReferences.Where(u => !meta.PackageReferences.Any(i => i.Name == u.Name));
+            var binaryRef = refListNotNuget.Where(u => u.ReferenceType == ProjectReferenceType.Reference);
+            var projRef = refListNotNuget.Except(binaryRef);
+
+            var binRefList = GetRefListString(binaryRef);
+            var projRefList = GetRefListString(projRef);
+
+            //var refList = refListNotNuget.Select(m => $"\t{m.Name} => {m.Version} [{m.ReferenceType}]");
+            var packageList = meta.PackageReferences.Select(m => $"\t{m.Name} => {m.Version}");
             Console.WriteLine(line);
+            DisplayReferenceList("Binary References",binRefList);
+            DisplayReferenceList("Project References",projRefList);
+            DisplayReferenceList("Packages", packageList);
+        }
+
+        static void DisplayReferenceList(string title, IEnumerable<string> strArr)
+        {
+            if (strArr.Any())
+            {
+                Console.WriteLine(title+":");
+                Console.WriteLine(string.Join("\n", strArr));
+            }
+        }
+
+        static IEnumerable<string> GetRefListString(IEnumerable<ProjectReference> items)
+        {
+            return items.Select(m => $"\t{m.Name} => {m.Version} [{m.ReferenceType}]");
         }
     }
 }
