@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CsProjToVs2017Upgrader": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\_Codebucket\\ia\\ia_backend\\ia.reports\\src\\Ia.Reports.ApiModels\\Ia.Reports.ApiModels.csproj\""
+    }
+  }
+}

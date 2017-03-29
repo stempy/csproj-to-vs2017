@@ -24,6 +24,11 @@ namespace CsProjToVs2017Upgrader.Models
 
         //public string ReferenceElement { get; set; }
         public ProjectReferenceType ReferenceType { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}, [{Version}] {HintPath}";
+        }
     }
 
     public enum ProjectReferenceType

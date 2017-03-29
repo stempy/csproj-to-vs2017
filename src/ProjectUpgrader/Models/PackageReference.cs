@@ -8,5 +8,10 @@ namespace CsProjToVs2017Upgrader.Models
     {
         public string Name { get; set; }
         public string Version { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}, {Version}";
+        }
     }
 }

@@ -7,14 +7,10 @@ namespace CsProjToVs2017Upgrader
     {
         static void Main(string[] args)
         {
-
             var projectReader = new ProjectFileReader();
-            var projInfo = projectReader.LoadProjectFile(@"C:\_Codebucket\ia\ia_backend\ia.domain\src\Ia.Domain.Models\Ia.Domain.Models.csproj");
-            
-            
+            var projInfo = projectReader.LoadProjectFile(args[0]);
 
-
-            Console.WriteLine("Hello World!");
+            //var json = 
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace CsProjToVs2017Upgrader
 {
-    public class ProjectFileReader
+    public class ProjectFileReader : IProjectFileReader
     {
         public XNamespace CsProjxmlns { get; set; } = "http://schemas.microsoft.com/developer/msbuild/2003";
 
@@ -23,15 +23,35 @@ namespace CsProjToVs2017Upgrader
                 ProjectFilePath = file
             };
             var content = File.ReadAllText(file);
-            XDocument doc = XDocument.Parse(content);
+            var doc = XDocument.Parse(content);
             p = InitMetaRoot(p, doc);
 
             p.ProjectReferences = GetProjectReferences(doc, file);
-
+            p.PackageReferences = GetPackageReferences(file);
 
             return p;
         }
 
+        /// <summary>
+        /// read packages.config
+        /// </summary>
+        /// <param name="projectFile"></param>
+        /// <returns></returns>
+        private IEnumerable<PackageReference> GetPackageReferences(string projectFile)
+        {
+            var packagePath = Path.GetDirectoryName(projectFile);
+            var packageFile = Path.Combine(packagePath, "packages.config");
+            var packageReader = new PackageConfigReader();
+            var pkgs = packageReader.GetPackageConfigReferences(packageFile);
+            return pkgs;
+        }
+
+        /// <summary>
+        /// Get project meta data
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         private ProjectMeta InitMetaRoot(ProjectMeta obj, XDocument doc)
         {
             obj.ProjectGuid = Guid.Parse(doc.Descendants(CsProjxmlns + "ProjectGuid").FirstOrDefault().Value);
@@ -61,12 +81,12 @@ namespace CsProjToVs2017Upgrader
         }
 
         /// <summary>
-        /// from .csproj
+        /// from .csproj, read references and project references
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        public IEnumerable<ProjectReference> GetProjectReferences(XDocument doc, string file)
+        private IEnumerable<ProjectReference> GetProjectReferences(XDocument doc, string file)
         {
             var packages = new List<ProjectReference>();
             var source = Path.GetFileName(file);
