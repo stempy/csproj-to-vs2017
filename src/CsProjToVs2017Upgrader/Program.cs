@@ -21,7 +21,7 @@ namespace CsProjToVs2017Upgrader
 
             foreach (var arg in args)
             {
-                ProcessPath(arg);
+                AnalyzeProjects(arg);
             }
 
             if (Debugger.IsAttached)
@@ -37,7 +37,11 @@ namespace CsProjToVs2017Upgrader
             Console.WriteLine("\tCsProjToVs2017Upgrader slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
         }
 
-        static void ProcessPath(string path)
+        /// <summary>
+        /// Analyze Projects to get reference and package information
+        /// </summary>
+        /// <param name="path"></param>
+        static void AnalyzeProjects(string path)
         {
             if (path.ToLower().EndsWith(".sln"))
             {
@@ -80,7 +84,7 @@ namespace CsProjToVs2017Upgrader
         {
             var filename = Path.GetFileName(meta.ProjectFilePath);
 
-            var line = $"{filename} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}]";
+            var line = $"Project:{filename} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}]";
             // get reference lists
             var refListNotNuget = meta.ProjectReferences.Where(u => !meta.PackageReferences.Any(i => i.Name == u.Name));
             var binaryRef = refListNotNuget.Where(u => u.ReferenceType == ProjectReferenceType.Reference);
@@ -95,6 +99,7 @@ namespace CsProjToVs2017Upgrader
             DisplayReferenceList("Binary References",binRefList);
             DisplayReferenceList("Project References",projRefList);
             DisplayReferenceList("Packages", packageList);
+            Console.WriteLine();
         }
 
         static void DisplayReferenceList(string title, IEnumerable<string> strArr)
@@ -108,7 +113,7 @@ namespace CsProjToVs2017Upgrader
 
         static IEnumerable<string> GetRefListString(IEnumerable<ProjectReference> items)
         {
-            return items.Select(m => $"\t{m.Name} => {m.Version} [{m.ReferenceType}]");
+            return items.Select(m => $"\t{m.Name} => [{m.ReferenceType}:{m.Version}] {m.HintPath}");
         }
     }
 }
