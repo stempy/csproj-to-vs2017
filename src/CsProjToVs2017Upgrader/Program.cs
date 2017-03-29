@@ -10,7 +10,13 @@ namespace CsProjToVs2017Upgrader
     {
         static void Main(string[] args)
         {
-            foreach(var arg in args)
+            if (args.Length < 1)
+            {
+                Usage();
+                return;
+            }
+
+            foreach (var arg in args)
             {
                 ProcessPath(arg);
             }
@@ -20,6 +26,12 @@ namespace CsProjToVs2017Upgrader
                 Console.WriteLine("Press any key to continute.");
                 Console.ReadKey();
             }
+        }
+
+        static void Usage()
+        {
+            Console.WriteLine("Old Csproj to VS2017 Upgrader\n=============================\nUsage:");
+            Console.WriteLine("\tCsProjToVs2017Upgrader slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
         }
 
         static void ProcessPath(string path)

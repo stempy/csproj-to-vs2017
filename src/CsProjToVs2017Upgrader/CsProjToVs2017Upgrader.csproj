@@ -13,4 +13,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectUpgrader\ProjectUpgrader.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="visual_studio_project_type_guids_list.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
