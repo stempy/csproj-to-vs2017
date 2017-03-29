@@ -16,6 +16,9 @@ namespace CsProjToVs2017Upgrader
         public IEnumerable<PackageReference> GetPackageConfigReferences(string filename)
         {
             var packages = new List<PackageReference>();
+            if (!File.Exists(filename))
+                return packages;
+
             var source = Path.GetFileName(filename);
             XDocument doc = XDocument.Load(filename);
             IEnumerable<XElement> childList =

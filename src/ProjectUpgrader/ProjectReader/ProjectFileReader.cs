@@ -75,7 +75,9 @@ namespace CsProjToVs2017Upgrader
             var pMapper = new ProjectTypesMapper();
 
             obj.ProjectTypeDesc = pMapper.GetProjectTypeDescription(obj.ProjectTypeGuid);
-
+            ProjectOutputType outType;
+            Enum.TryParse<ProjectOutputType>(obj.OutputType, out outType);
+            obj.ProjectType = pMapper.GetProjectType(obj.ProjectTypeGuid,outType);
 
             return obj;
         }

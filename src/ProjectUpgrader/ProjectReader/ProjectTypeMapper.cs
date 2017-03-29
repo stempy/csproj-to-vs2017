@@ -5,6 +5,25 @@ using System.IO;
 
 namespace CsProjToVs2017Upgrader
 {
+    public enum ProjectType
+    {
+        None,
+        LegacyConsole,
+        LegacyClassLibrary,
+        LegacyMvcApplication,
+
+        StandardClassLibary,
+        CoreMvc,
+        CoreConsole
+    }
+
+    public enum ProjectOutputType
+    {
+        Exe,
+        Library
+    }
+
+
     public class ProjectTypesMapper
     {
         private static Dictionary<Guid, string> _projectTypeDictionary;
@@ -14,6 +33,21 @@ namespace CsProjToVs2017Upgrader
         {
             return _projectTypeDictionary.ContainsKey(projectTypeGuid) ? _projectTypeDictionary[projectTypeGuid] : null;
         }
+
+        public ProjectType GetProjectType(Guid projectTypeGuid, ProjectOutputType projectOutputType=ProjectOutputType.Library)
+        {
+            var pDesc = GetProjectTypeDescription(projectTypeGuid);
+            var isMvc = pDesc?.ToLower().Contains("mvc");
+
+            switch (projectOutputType)
+            {
+                case ProjectOutputType.Exe:
+                    return ProjectType.LegacyConsole;
+            }
+
+            return isMvc!=null && isMvc==true ? ProjectType.LegacyMvcApplication : ProjectType.LegacyClassLibrary;
+        }
+
 
         public Guid GetProjectTypeGuid(string projectTypeString)
         {

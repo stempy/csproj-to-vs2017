@@ -6,6 +6,7 @@ namespace CsProjToVs2017Upgrader.Models
 {
     public class ProjectMeta
     {
+        public string ProjectName { get; set; }
         public string ProjectFilePath { get; set; }
         public string ProjectFileRelativePath { get; set; }
         public Guid ProjectGuid { get; set; }
@@ -26,6 +27,7 @@ namespace CsProjToVs2017Upgrader.Models
         public IEnumerable<ProjectReference> ProjectReferences { get; set; }
         public IEnumerable<PackageReference> PackageReferences { get; set; }
 
-        public string OutputType { get; internal set; }
+        public string OutputType { get; set; }
+        public ProjectType ProjectType { get; set; }
     }
 }
