@@ -10,16 +10,24 @@ namespace CsProjToVs2017Upgrader
     {
         static void Main(string[] args)
         {
-            var actualPath = slnPath;
+            foreach(var arg in args)
+            {
+                ProcessPath(arg);
+            }
 
-            ProcessPath(actualPath);
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine("Press any key to continute.");
+                Console.ReadKey();
+            }
         }
 
         static void ProcessPath(string path)
         {
             if (path.ToLower().EndsWith(".sln"))
             {
-                Console.WriteLine($"Parsing solution file \"{path}\" ...");
+                Console.WriteLine($"\nParsing solution file \"{path}\"");
+                Console.WriteLine("============================================================");
                 ISolutionReader solutionReader = new SolutionReader();
                 var projList = solutionReader.ParseProjectsInSolution(path);
 
@@ -44,17 +52,16 @@ namespace CsProjToVs2017Upgrader
                 Console.WriteLine($"{projList.Count()} project files found libs:{numLibs} mvc:{numMvc} console:{numConsole}");
             } else
             {
+                Console.WriteLine($"\nParsing project file \"{path}\"");
+                Console.WriteLine("============================================================");
+
                 var projectReader = new ProjectFileReader();
                 var projInfo = projectReader.LoadProjectFile(path);
                 DisplayInfo(projInfo);
             }
 
 
-            if (Debugger.IsAttached)
-            {
-                Console.WriteLine("Press any key to continute.");
-                Console.ReadKey();
-            }
+          
         }
 
         static void DisplayInfo(ProjectMeta meta)
