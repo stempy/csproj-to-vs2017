@@ -1,5 +1,6 @@
 ﻿using CsProjToVs2017Upgrader;
 using CsProjToVs2017Upgrader.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ namespace ProjectUpgrader.Upgraders
     /// <summary>
     /// see: http://www.natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/
     /// </summary>
-    public class ProjectToVs2017ProjectUpgrader
+    public class ProjectToVs2017ProjectUpgrader : IProjectToVs2017ProjectUpgrader
     {
         IProjectFileReader _projectReader;
         ReferenceToPackageReferenceUpgrader _nugetRefUpdater;
@@ -21,10 +22,16 @@ namespace ProjectUpgrader.Upgraders
             _nugetRefUpdater = new ReferenceToPackageReferenceUpgrader();
         }
 
+
         public void UpgradeProjectFile(string srcProjectFile)
         {
             var projFileDest = Path.Combine(Path.GetDirectoryName(srcProjectFile),Path.GetFileNameWithoutExtension(srcProjectFile)+"_upgraded.csproj");
             var projInfo = _projectReader.LoadProjectFile(srcProjectFile);
+
+            if (projInfo.ProjectType != ProjectType.LegacyClassLibrary)
+            {
+                throw new Exception($"{srcProjectFile} is not a legacy class library. Cannot update");
+            }
 
             // get binary references split up into nuget and non
             var references = projInfo.ProjectReferences.Where(m => m.ReferenceType == ProjectReferenceType.Reference);

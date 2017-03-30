@@ -15,11 +15,18 @@ namespace CsProjToVs2017Upgrader
             }
 
             var ap = new ProjectAnalyzer();
+            var projectUpgrader = new UpgradeProjectToVs2017();
             var slns = new Dictionary<string, string>();
 
             foreach (var arg in args)
             {
                 var projectsAnalyzed = ap.AnalyzeProjectsPath(arg);
+
+                // now upgrade .csproj where suited
+                foreach (var project in projectsAnalyzed)
+                {
+                    projectUpgrader.UpgradeProject(project.ProjectFilePath);
+                }
             }
 
             if (Debugger.IsAttached)
