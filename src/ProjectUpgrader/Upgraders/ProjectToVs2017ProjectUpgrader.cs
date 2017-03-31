@@ -69,33 +69,55 @@ namespace ProjectUpgrader.Upgraders
             // build referencegroups
             var projRefEl = CreateReferenceItems(projectRefs);
             var binReflEl = CreateReferenceItems(binRefs);
+            var pkgRefEl = CreatePackageReferenceItems(newNugetPackageReferenes);
 
             var itemGroup = new XElement("ItemGroup");
-            foreach (var xel in binReflEl)
-            {
-                itemGroup.Add(xel);
-            }
-            foreach (var xel in projRefEl)
-            {
-                itemGroup.Add(xel);
-            }
-
+            AddElements(itemGroup, projRefEl);
+            AddElements(itemGroup, binReflEl);
+            AddElements(itemGroup, pkgRefEl);
+            // add <ItemGroup> element with all references to project root
             root.Add(itemGroup);
 
+            // write xml file
             var outputDir = Path.Combine(Path.GetTempPath(), "Cs2017ProjectUpgrader");
-            if (!Directory.Exists(outputDir))
-                Directory.CreateDirectory(outputDir);
-
             var destFile = Path.Combine(outputDir, Path.GetFileName(projFileDest));
-
             Console.WriteLine(destFile);
+
+            WriteNewCsProjectFile(destFile, root);
+        }
+
+        private void AddElements(XElement itemgroup, IEnumerable<XElement> items)
+        {
+            foreach (var xel in items)
+            {
+                itemgroup.Add(xel);
+            }
+        }
+
+        private void WriteNewCsProjectFile(string destFile, XElement rootElement)
+        {
+            var dir = Path.GetDirectoryName(destFile);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            
             var fs = new FileStream(destFile, FileMode.Create);
             XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-            XmlWriter xWrite = XmlWriter.Create(fs,settings);
-            XDocument xDoc = new XDocument(root);
+            XmlWriter xWrite = XmlWriter.Create(fs, settings);
+            XDocument xDoc = new XDocument(rootElement);
             xDoc.Save(fs);
             xWrite.Flush();
             fs.Flush();
+        }
+
+
+        private IEnumerable<XElement> CreatePackageReferenceItems(IEnumerable<PackageReference> refs)
+        {
+            var pkgRefs = refs.Select(y => new XElement("PackageReference",
+                                            new XAttribute("Include", y.Name),
+                                            new XAttribute("Version",y.Version))
+                                     );
+            return pkgRefs;
         }
 
         private IEnumerable<XElement> CreateReferenceItems(IEnumerable<ProjectReference> refs)
