@@ -210,12 +210,16 @@ namespace ProjectUpgrader.Upgraders
 
             switch (oldFwversionString)
             {
+                case "v4.0":
+                    return "net40";
                 case "v4.6.1":
                     return "net461";
                 case "v4.6.2":
                     return "net462";
                 case "v4.5.2":
                     return "net452";
+                case "v4.5.1":
+                    return "net451";
             }
             return oldFwversionString;
         }
