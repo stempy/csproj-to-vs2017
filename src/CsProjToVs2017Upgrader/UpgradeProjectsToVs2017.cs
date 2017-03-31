@@ -12,16 +12,17 @@ namespace CsProjToVs2017Upgrader
             _projectUpgrader = new ProjectToVs2017ProjectUpgrader();
         }
 
-        public void UpgradeProject(string projFile)
+        public string UpgradeProject(string projFile)
         {
             try
             {
-                _projectUpgrader.UpgradeProjectFile(projFile);
+                return _projectUpgrader.UpgradeProjectFile(projFile);
             } catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            
+
+            return string.Empty;
         }
     }
 }

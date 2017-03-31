@@ -29,5 +29,7 @@ namespace CsProjToVs2017Upgrader.Models
 
         public string OutputType { get; set; }
         public ProjectType ProjectType { get; set; }
+
+        public string BelongsToSolutionFile { get; set; }
     }
 }

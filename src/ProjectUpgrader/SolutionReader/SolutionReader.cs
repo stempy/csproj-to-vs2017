@@ -32,7 +32,8 @@ namespace ProjectUpgrader.SolutionReader
                 ProjectName = x.Groups[2].Value,
                 ProjectFileRelativePath = x.Groups[3].Value,
                 ProjectFilePath = x.Groups[3].Value,
-                ProjectGuid = Guid.Parse(x.Groups[5].Value)
+                ProjectGuid = Guid.Parse(x.Groups[5].Value),
+                BelongsToSolutionFile = slnFile
             }).ToList();
 
 
@@ -46,7 +47,9 @@ namespace ProjectUpgrader.SolutionReader
                 path = Path.GetFullPath(path);
                 if (path.EndsWith(".csproj"))
                 {
-                    projList.Add(projReader.LoadProjectFile(path));
+                    var projItem = projReader.LoadProjectFile(path);
+                    projItem.BelongsToSolutionFile = slnFile;
+                    projList.Add(projItem);
                 }
                 
             }

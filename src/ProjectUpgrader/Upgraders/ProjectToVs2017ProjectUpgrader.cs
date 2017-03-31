@@ -25,15 +25,17 @@ namespace ProjectUpgrader.Upgraders
         }
 
 
-        public void UpgradeProjectFile(string srcProjectFile)
+        public string UpgradeProjectFile(string srcProjectFile)
         {
-            var projFileDest = Path.Combine(Path.GetDirectoryName(srcProjectFile), Path.GetFileNameWithoutExtension(srcProjectFile) + "_upgraded.csproj");
+            var projFileDest = Path.Combine(Path.GetDirectoryName(srcProjectFile), 
+                                            Path.GetFileName(srcProjectFile));
+
             var projInfo = _projectReader.LoadProjectFile(srcProjectFile);
 
-            if (projInfo.ProjectType != ProjectType.LegacyClassLibrary)
-            {
-                throw new Exception($"{srcProjectFile} is not a legacy class library. Cannot update");
-            }
+            //if (projInfo.ProjectType != ProjectType.LegacyClassLibrary)
+            //{
+            //    throw new Exception($"{srcProjectFile} is not a legacy class library. Cannot update");
+            //}
 
             // get binary references split up into nuget and non
             var references = projInfo.ProjectReferences.Where(m => m.ReferenceType == ProjectReferenceType.Reference);
@@ -61,53 +63,83 @@ namespace ProjectUpgrader.Upgraders
             XElement root =
                 new XElement("Project", new XAttribute("Sdk", "Microsoft.NET.Sdk"));
 
+            
             // propertygroups
-            root.Add(new XElement("PropertyGroup",
-                        new XElement("TargetFramework", newFw)
-                ));
+            var propertyGroups = new XElement("PropertyGroup",
+                                    new XElement("TargetFramework", newFw));
+
+            var props = CreatePropertyGroups(projInfo);
+            foreach(var p in props)
+            {
+                propertyGroups.Add(new XElement(p.Key, p.Value));
+            }
+
+            root.Add(propertyGroups);
 
             // build referencegroups
             var projRefEl = CreateReferenceItems(projectRefs);
             var binReflEl = CreateReferenceItems(binRefs);
             var pkgRefEl = CreatePackageReferenceItems(newNugetPackageReferenes);
 
-            var itemGroup = new XElement("ItemGroup");
-            AddElements(itemGroup, projRefEl);
-            AddElements(itemGroup, binReflEl);
-            AddElements(itemGroup, pkgRefEl);
             // add <ItemGroup> element with all references to project root
-            root.Add(itemGroup);
+
+            var itemGroups = new List<XElement>();
+            itemGroups.Add(AddItemGroupReferences(projRefEl));
+            itemGroups.Add(AddItemGroupReferences(binReflEl));
+            itemGroups.Add(AddItemGroupReferences(pkgRefEl));
+            foreach(var i in itemGroups)
+            {
+                // add as separate itemgroups
+                root.Add(i);
+            }
 
             // write xml file
             var outputDir = Path.Combine(Path.GetTempPath(), "Cs2017ProjectUpgrader");
-            var destFile = Path.Combine(outputDir, Path.GetFileName(projFileDest));
+            var destFile = Path.Combine(outputDir, 
+                                    Path.GetFileNameWithoutExtension(projFileDest)
+                                    +Path.DirectorySeparatorChar
+                                    +Path.GetFileName(projFileDest));
             Console.WriteLine(destFile);
 
-            WriteNewCsProjectFile(destFile, root);
+            WriteNewCsProjectFile(srcProjectFile, destFile, root);
+            return destFile;
         }
 
-        private void AddElements(XElement itemgroup, IEnumerable<XElement> items)
+        private XElement AddItemGroupReferences(IEnumerable<XElement> items)
         {
+            var itemGroup = new XElement("ItemGroup");
             foreach (var xel in items)
             {
-                itemgroup.Add(xel);
+                itemGroup.Add(xel);
             }
+            return itemGroup;
         }
 
-        private void WriteNewCsProjectFile(string destFile, XElement rootElement)
+        private void WriteNewCsProjectFile(string srcFile,string destFile, XElement rootElement)
         {
             var dir = Path.GetDirectoryName(destFile);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
             
-            var fs = new FileStream(destFile, FileMode.Create);
-            XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-            XmlWriter xWrite = XmlWriter.Create(fs, settings);
-            XDocument xDoc = new XDocument(rootElement);
-            xDoc.Save(fs);
-            xWrite.Flush();
-            fs.Flush();
+            using(var fs = new FileStream(destFile, FileMode.OpenOrCreate))
+            {
+                XmlWriterSettings settings = new XmlWriterSettings() {
+                    Indent = true,OmitXmlDeclaration=true };
+                XmlWriter xWrite = XmlWriter.Create(fs, settings);
+                //XDocument xDoc = new XDocument(rootElement);
+                //xDoc.Save(fs);
+                rootElement.WriteTo(xWrite);
+                xWrite.Flush();
+                fs.Flush();
+            }
+
+
+            
+
+
+            var oldCsProj = Path.GetFileNameWithoutExtension(srcFile) + "_old.csproj";
+            File.Copy(srcFile, Path.Combine(dir, oldCsProj),true);
         }
 
 
@@ -129,7 +161,7 @@ namespace ProjectUpgrader.Upgraders
 
             var binRef = refs.Where(y => y.ReferenceType == ProjectReferenceType.Reference)
                              .Select(r => new XElement("Reference", 
-                                            new XAttribute("Include",r.Include)));
+                                            new XAttribute("Include",r.Name)));
 
             var allRefs = projRefs.Concat(binRef);
             return allRefs;
@@ -162,6 +194,10 @@ namespace ProjectUpgrader.Upgraders
             if (meta.AssemblyName != projectFilename)
             {
                 d.Add("AssemblyName", meta.AssemblyName);
+            }
+            if (meta.OutputType!= "Library")
+            {
+                d.Add("OutputType", meta.OutputType);
             }
 
             return d;

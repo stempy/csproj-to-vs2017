@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace CsProjToVs2017Upgrader
 {
@@ -22,11 +24,36 @@ namespace CsProjToVs2017Upgrader
             {
                 var projectsAnalyzed = ap.AnalyzeProjectsPath(arg);
 
+                bool copySolution = false;
+                string newSlnPath = string.Empty;
+                string slnSrc = string.Empty;
+
                 // now upgrade .csproj where suited
                 foreach (var project in projectsAnalyzed)
                 {
-                    projectUpgrader.UpgradeProject(project.ProjectFilePath);
+                    var newProjFile=projectUpgrader.UpgradeProject(project.ProjectFilePath);
+                    if (!string.IsNullOrEmpty(project.BelongsToSolutionFile) 
+                        &&  !copySolution)
+                    {
+                        slnSrc = project.BelongsToSolutionFile;
+                        var newSlnFileName = Path.GetFileNameWithoutExtension(project.BelongsToSolutionFile) + "_upgraded.sln";
+                        var slnDir = Path.GetDirectoryName(Path.GetDirectoryName(newProjFile));
+                        newSlnPath = Path.Combine(slnDir, newSlnFileName);
+                        copySolution = true;
+                    }
                 }
+
+                if (!string.IsNullOrEmpty(slnSrc))
+                {
+                    // has a sln 
+                    var slnText = File.ReadAllText(slnSrc);
+                    //slnText = slnText.Replace(".csproj", "_upgraded.csproj");
+                    File.WriteAllText(newSlnPath, slnText);
+                    Console.WriteLine("new sln " + newSlnPath);
+                }
+
+
+
             }
 
             if (Debugger.IsAttached)
