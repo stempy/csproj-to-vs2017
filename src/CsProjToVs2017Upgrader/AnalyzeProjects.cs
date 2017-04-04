@@ -4,11 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace CsProjToVs2017Upgrader
 {
     public class ProjectAnalyzer
     {
+        private ILogger _log;
+
+        public ProjectAnalyzer(ILogger logger)
+        {
+            _log = logger;
+        }
+        
         /// <summary>
         /// Analyze Projects to get reference and package information
         /// Display results verbose

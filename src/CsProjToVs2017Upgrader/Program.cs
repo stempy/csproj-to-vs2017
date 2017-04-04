@@ -4,18 +4,33 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using CsProjToVs2017Upgrader.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace CsProjToVs2017Upgrader
 {
     class Program
     {
+        static ILoggerFactory loggerFactory;
+        public static IConfigurationRoot Configuration { get; set; }
+
         static void Main(string[] args)
         {
+            //var builder = new ConfigurationBuilder()
+            // .SetBasePath(Directory.GetCurrentDirectory())
+            //.AddJsonFile("appsettings.json");
+            //Configuration = builder.Build();
+
             if (args.Length < 1)
             {
                 Usage();
                 return;
             }
+
+            ILoggerFactory loggerFactory = new LoggerFactory()
+                .AddConsole()
+                .AddDebug();
+
 
             bool generateUpgrades = false;
             if (args.Contains("--generate") || args.Contains("-g"))
@@ -25,7 +40,8 @@ namespace CsProjToVs2017Upgrader
                 args = args.Where(m => m != "--generate").ToArray();
             }
 
-            var ap = new ProjectAnalyzer();
+
+            var ap = new ProjectAnalyzer(loggerFactory.CreateLogger<ProjectAnalyzer>());
 
             foreach (var arg in args)
             {
