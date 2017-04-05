@@ -56,6 +56,18 @@ namespace ProjectUpgrader.Upgraders
             var content = File.ReadAllText(srcProjectFile);
             var doc = XDocument.Parse(content);
 
+            var toolsVersionAttr = doc.Descendants(_projectNameSpace + "Project")
+                                      .Attributes("ToolsVersion").FirstOrDefault();
+            
+            if (toolsVersionAttr != null)
+            {
+                var toolVer = new Version(toolsVersionAttr.Value);
+                if (toolVer < Version.Parse("14.0"))
+                {
+                    toolsVersionAttr.Value = "14.0";
+                }
+            }
+
             var refs = _xmlHelpers.GetNugetRefs(doc);
             
             var packagesAttrXName = XName.Get("Include");
