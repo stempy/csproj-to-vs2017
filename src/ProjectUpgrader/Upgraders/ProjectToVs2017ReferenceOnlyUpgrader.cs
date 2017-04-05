@@ -105,13 +105,11 @@ namespace ProjectUpgrader.Upgraders
                 XmlWriterSettings settings = new XmlWriterSettings()
                 {
                     Indent = true,
-                    WriteEndDocumentOnClose = false
+                    //WriteEndDocumentOnClose = false
                     //OmitXmlDeclaration = true
                 };
                 XmlWriter xWrite = XmlWriter.Create(fs,settings);
-                //XDocument xDoc = new XDocument(rootElement);
-                //xDoc.Save(fs);
-                doc.Save(fs);
+                doc.WriteTo(xWrite);
                 xWrite.Flush();
                 fs.Flush();
             }
