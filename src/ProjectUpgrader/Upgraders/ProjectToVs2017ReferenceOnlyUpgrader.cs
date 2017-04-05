@@ -58,9 +58,6 @@ namespace ProjectUpgrader.Upgraders
 
             var refs = _xmlHelpers.GetNugetRefs(doc);
             
-
-
-            // remove packages.config
             var packagesAttrXName = XName.Get("Include");
             var packagesElementToRemove = doc.Descendants(_projectNameSpace+"None")
                                             //.Elements("None")
@@ -75,27 +72,35 @@ namespace ProjectUpgrader.Upgraders
                                                         .Value == "packages.config").FirstOrDefault();
             }
 
-
             if (packagesElementToRemove != null)
             {
                 var packagesConfigPath = packagesElementToRemove.Attribute(packagesAttrXName).Value;
                 packagesConfigPath = Path.Combine(projectPath, packagesConfigPath);
                 var packageRefItems = _packageConfigReader.GetPackageConfigReferences(packagesConfigPath);
+                var newPackageReferences = _xmlHelpers.CreatePackageReferenceItems(packageRefItems);
 
+                // remove binary direct references from xdoc
+                refs.Remove();
 
                 // remove packages.config from xdoc
                 packagesElementToRemove.Remove();
-            }
 
-            WriteNewCsProjectFile(srcProjectFile, destProjectFile, doc);
+
+                // Add new package references to xdoc
+                var newItemGroup = _xmlHelpers.AddItemGroupReferences(newPackageReferences);
+                doc.Element(_projectNameSpace+"Project").Add(newItemGroup);
+            }
             
+            WriteNewCsProjectFile(srcProjectFile, destProjectFile, doc);
+
+            _log.LogInformation(destProjectFile);
         }
 
       
 
         private void WriteNewCsProjectFile(string srcFile,string destFile, XDocument doc)
         {
-            using (var fs = new FileStream(destFile, FileMode.OpenOrCreate))
+            using (var fs = new FileStream(destFile, FileMode.Create))
             {
                 XmlWriterSettings settings = new XmlWriterSettings()
                 {
@@ -112,7 +117,7 @@ namespace ProjectUpgrader.Upgraders
             }
 
             var destDir = Path.GetDirectoryName(destFile);
-            var oldCsProj = Path.GetFileNameWithoutExtension(srcFile) + "_old.csproj";
+            var oldCsProj = Path.GetFileNameWithoutExtension(srcFile) + ".old.csproj";
             File.Copy(srcFile, Path.Combine(destDir, oldCsProj), true);
         }
     }
