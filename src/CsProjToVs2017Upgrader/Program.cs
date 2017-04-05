@@ -49,7 +49,7 @@ namespace CsProjToVs2017Upgrader
                 // -u upgrade references only
                 if (upgradeReferences)
                 {
-                    var dir = GetDestDir();
+                    var dir = PathHelpers.GetDestDir();
                     UpgradeReferences(dir, projectsAnalyzed,slnFile);
                 } else
                 {
@@ -107,112 +107,56 @@ namespace CsProjToVs2017Upgrader
             Console.WriteLine();
         }
 
-
-        static string GetDestDir(string relativePath="")
-        {
-            var destDir = Path.Combine(Path.GetTempPath()+Path.DirectorySeparatorChar, "VS2017_Upgrade");
-            CreateDirIfNotExist(destDir);
-            return destDir;
-        }
-
-        static string GetFileDestPath(string srcProjPath, string destDir)
-        {
-            var projDirName = Path.GetFileName( Path.GetDirectoryName(srcProjPath));
-            var projDestDir = Path.Combine(destDir, projDirName);
-            var fullPath= Path.Combine(projDestDir, Path.GetFileName(srcProjPath));
-            CreateDirIfNotExist(Path.GetDirectoryName(fullPath));
-            return fullPath;
-        }
-
-        static string GetDirectoryAsFileName(string fullPath)
-        {
-            return Path.GetFileName(Path.GetDirectoryName(fullPath));
-        }
-
-        static void CreateDirIfNotExist(string dirPath)
-        {
-            if (!Directory.Exists(dirPath))
-                Directory.CreateDirectory(dirPath);
-        }
-
-
         static void UpgradeReferences(string destDir, IEnumerable<ProjectMeta> projects, string slnFile)
         {
-            // copy sln file to destination
-            if (!string.IsNullOrEmpty(slnFile))
-            {
-                destDir = Path.Combine(destDir, Path.GetFileName(slnFile));
-                CreateDirIfNotExist(destDir);
-                File.Copy(slnFile, Path.Combine(destDir, Path.GetFileName(slnFile)));
-            }
+            destDir = CopySlnFile(slnFile, destDir);
 
             // now process csproj files and save to destination instead of overwriting
             foreach (var p in projects)
             {
-                var destProjFile = GetFileDestPath(p.ProjectFilePath, destDir);
+                var destProjFile = PathHelpers.GetFileDestPath(p.ProjectFilePath, destDir);
                 _refUpgrader.UpgradeProjectFile(p.ProjectFilePath, false, destProjFile);
             }
         }
 
-
-        static void CopySlnFile(string slnFile,string destDir)
-        {
-
-        }
-
         static void GenerateUpgrades(IEnumerable<ProjectMeta> projects, string slnFile)
         {
-            var destDir = GetDestDir();
+            var projectUpgrader = new UpgradeProjectToVs2017();
+            var destDir = PathHelpers.GetDestDir();
             destDir = Path.Combine(destDir, "FullUpgrades");
 
-
             // copy sln file to destination
-            if (!string.IsNullOrEmpty(slnFile))
-            {
-                destDir = Path.Combine(destDir, Path.GetFileName(slnFile));
-                CreateDirIfNotExist(destDir);
-                File.Copy(slnFile, Path.Combine(destDir, Path.GetFileName(slnFile)));
-            } else
-            {
-                CreateDirIfNotExist(destDir);
-            }
-            
-
-
-            // upgrade if --generate | -g
-            bool copySolution = false;
-            string newSlnPath = string.Empty;
-            string slnSrc = string.Empty;
-
-            var projectUpgrader = new UpgradeProjectToVs2017();
+            destDir=CopySlnFile(slnFile, destDir);
 
             // now upgrade .csproj where suited
             foreach (var project in projects)
             {
-                var projDir = Path.Combine(destDir, GetDirectoryAsFileName(project.ProjectFilePath));
+                var projDir = Path.Combine(destDir, PathHelpers.GetDirectoryAsFileName(project.ProjectFilePath));
                 var projFileDest = Path.Combine(projDir, Path.GetFileName(project.ProjectFilePath));
-                CreateDirIfNotExist(projDir);
+                PathHelpers.CreateDirIfNotExist(projDir);
                 var newProjFile = projectUpgrader.UpgradeProject(project.ProjectFilePath, projFileDest);
-                if (!string.IsNullOrEmpty(slnFile)
-                    && !copySolution)
-                {
-                    slnSrc = project.BelongsToSolutionFile;
-                    var newSlnFileName = Path.GetFileNameWithoutExtension(project.BelongsToSolutionFile) + "_upgraded.sln";
-                    var slnDir = Path.GetDirectoryName(Path.GetDirectoryName(newProjFile));
-                    newSlnPath = Path.Combine(slnDir, newSlnFileName);
-                    copySolution = true;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(slnSrc))
-            {
-                // has a sln 
-                var slnText = File.ReadAllText(slnSrc);
-                //slnText = slnText.Replace(".csproj", "_upgraded.csproj");
-                File.WriteAllText(newSlnPath, slnText);
-                Console.WriteLine("new sln " + newSlnPath);
+                
             }
         }
+
+
+        static string CopySlnFile(string slnFile, string destDir)
+        {
+            // copy sln file to destination
+            if (!string.IsNullOrEmpty(slnFile))
+            {
+                destDir = Path.Combine(destDir, Path.GetFileName(slnFile));
+                PathHelpers.CreateDirIfNotExist(destDir);
+                File.Copy(slnFile, Path.Combine(destDir, Path.GetFileName(slnFile)), true);
+            }
+            else
+            {
+                PathHelpers.CreateDirIfNotExist(destDir);
+            }
+
+            return destDir;
+        }
+
       
     }
 }
