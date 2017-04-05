@@ -24,7 +24,7 @@ Just specifying the solution or project files will just analyze solution project
 
 There are two approaches:
 
-1. `-g|--generate` Upgrade just the nuget references that are referenced as binary dlls using `<Reference>` element in .csproj, and convert them to `<PackageReference>` elements in csproj, and remove `packages.config`, This is least destructive, and should work fine on class library projects and projects referencing them. see (MSBuild PackageReference post)<http://blog.nuget.org/20170316/NuGet-now-fully-integrated-into-MSBuild.html?utm_content=buffera4d96&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer> for more information.
+1. `-u|--upgraderef` Upgrade just the nuget references that are referenced as binary dlls using `<Reference>` element in .csproj, and convert them to `<PackageReference>` elements in csproj, and remove `packages.config`, This is least destructive, and should work fine on class library projects and projects referencing them. see (MSBuild PackageReference post)<http://blog.nuget.org/20170316/NuGet-now-fully-integrated-into-MSBuild.html?utm_content=buffera4d96&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer> for more information.
 
-2. `-u|--upgraderef` Generate completely new csproj files for .NETStandard approach. This will require more work. see http://www.natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/
+2. `-g|--generate` Generate completely new csproj files for .NETStandard approach. This will require more work. see http://www.natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/
 
