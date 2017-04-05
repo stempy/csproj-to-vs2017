@@ -91,8 +91,9 @@ namespace ProjectUpgrader.Upgraders
         {
             var pkgRefs = refs.Select(y => new XElement(_projectNameSpace+ "PackageReference",
                                             new XAttribute("Include", y.Name),
-                                            new XAttribute("Version", y.Version))
-                                     );
+                                                new XElement(_projectNameSpace+"Version",y.Version)
+                                            
+                                     ));
             return pkgRefs;
         }
 
