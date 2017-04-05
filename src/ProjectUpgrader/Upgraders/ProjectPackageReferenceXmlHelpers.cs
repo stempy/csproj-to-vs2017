@@ -7,6 +7,30 @@ namespace ProjectUpgrader.Upgraders
 {
     public class ProjectPackageReferenceXmlHelpers
     {
+        private XNamespace _projectNameSpace = "http://schemas.microsoft.com/developer/msbuild/2003";
+
+        public IEnumerable<XElement> GetNugetRefs(XDocument doc)
+        {
+            var refs = GetReferences(doc);
+            var nrefs = new List<XElement>();
+            foreach (var r in refs)
+            {
+                var hintPath = r.Elements(_projectNameSpace + "HintPath").FirstOrDefault();
+
+                if (hintPath != null && !string.IsNullOrEmpty(hintPath.Value) && hintPath.Value.Contains("packages\\"))
+                {
+                    nrefs.Add(r);
+                }
+            }
+            return nrefs;
+        }
+
+        public IEnumerable<XElement> GetReferences(XDocument doc)
+        {
+            return doc.Descendants(_projectNameSpace + "Reference");
+        }
+
+
         public IEnumerable<XElement> CreatePackageReferenceItems(IEnumerable<PackageReference> refs)
         {
             var pkgRefs = refs.Select(y => new XElement("PackageReference",

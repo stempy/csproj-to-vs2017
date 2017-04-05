@@ -31,16 +31,53 @@ namespace CsProjToVs2017Upgrader
                 return;
             }
 
+            InitServices();
+
+            bool generateUpgrades = false;
+            bool upgradeReferences = false;
+
+            ProcessCommandLineArgs(ref args, ref generateUpgrades, ref upgradeReferences);
+
+            foreach (var arg in args)
+            {
+                // 1. analyze projects
+                var projectsAnalyzed = _projectAnalyzer.AnalyzeProjectsPath(arg);
+
+                // -u upgrade references only
+                if (upgradeReferences)
+                {
+                    var dir = GetDestDir();
+                    UpgradeReferences(dir, projectsAnalyzed);
+                } else
+                {
+                    // -g generate
+                    if (generateUpgrades)
+                    {
+                        GenerateUpgrades(projectsAnalyzed);
+                    }
+                }
+            }
+
+            // finished
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine("Press any key to continute.");
+                Console.ReadKey();
+            }
+        }
+
+        private static void InitServices()
+        {
             ILoggerFactory loggerFactory = new LoggerFactory()
                 .AddConsole()
                 .AddDebug();
 
             _refUpgrader = new ProjectToVs2017ReferenceOnlyUpgrader(loggerFactory.CreateLogger<ProjectToVs2017ReferenceOnlyUpgrader>());
             _projectAnalyzer = new ProjectAnalyzer(loggerFactory.CreateLogger<ProjectAnalyzer>());
+        }
 
-            bool generateUpgrades = false;
-            bool upgradeReferences = false;
-
+        private static void ProcessCommandLineArgs(ref string[] args, ref bool generateUpgrades, ref bool upgradeReferences)
+        {
             if (args.Contains("--generate") || args.Contains("-g"))
             {
                 generateUpgrades = true;
@@ -53,32 +90,6 @@ namespace CsProjToVs2017Upgrader
                 upgradeReferences = true;
                 generateUpgrades = false;
                 args = args.Where(m => m != "-u" && m != "--upgraderefs").ToArray();
-            }
-
-
-            
-
-            foreach (var arg in args)
-            {
-                // 1. analyze projects
-                var projectsAnalyzed = _projectAnalyzer.AnalyzeProjectsPath(arg);
-
-                if (generateUpgrades)
-                {
-                    GenerateUpgrades(projectsAnalyzed);
-                }
-
-                if (upgradeReferences)
-                {
-                    var dir = GetDestDir();
-                    UpgradeReferences(dir,projectsAnalyzed);
-                }
-            }
-
-            if (Debugger.IsAttached)
-            {
-                Console.WriteLine("Press any key to continute.");
-                Console.ReadKey();
             }
         }
 
@@ -113,7 +124,7 @@ namespace CsProjToVs2017Upgrader
             foreach(var p in projects)
             {
                 var destFile = GetFileDestPath(p.ProjectFilePath, destDir);
-
+                _refUpgrader.UpgradeProjectFile(p.ProjectFilePath, false, destFile);
             }
         }
 
