@@ -6,13 +6,17 @@ using System.IO;
 using CsProjToVs2017Upgrader.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using ProjectUpgrader.Upgraders;
 
 namespace CsProjToVs2017Upgrader
 {
     class Program
     {
         static ILoggerFactory loggerFactory;
-        public static IConfigurationRoot Configuration { get; set; }
+        static IConfigurationRoot Configuration { get; set; }
+        static IProjectToVs2017ReferenceOnlyUpgrader _refUpgrader;
+        static ProjectAnalyzer _projectAnalyzer;
+
 
         static void Main(string[] args)
         {
@@ -31,6 +35,8 @@ namespace CsProjToVs2017Upgrader
                 .AddConsole()
                 .AddDebug();
 
+            _refUpgrader = new ProjectToVs2017ReferenceOnlyUpgrader(loggerFactory.CreateLogger<ProjectToVs2017ReferenceOnlyUpgrader>());
+            _projectAnalyzer = new ProjectAnalyzer(loggerFactory.CreateLogger<ProjectAnalyzer>());
 
             bool generateUpgrades = false;
             bool upgradeReferences = false;
@@ -50,16 +56,22 @@ namespace CsProjToVs2017Upgrader
             }
 
 
-            var ap = new ProjectAnalyzer(loggerFactory.CreateLogger<ProjectAnalyzer>());
+            
 
             foreach (var arg in args)
             {
                 // 1. analyze projects
-                var projectsAnalyzed = ap.AnalyzeProjectsPath(arg);
+                var projectsAnalyzed = _projectAnalyzer.AnalyzeProjectsPath(arg);
 
                 if (generateUpgrades)
                 {
                     GenerateUpgrades(projectsAnalyzed);
+                }
+
+                if (upgradeReferences)
+                {
+                    var dir = GetDestDir();
+                    UpgradeReferences(dir,projectsAnalyzed);
                 }
             }
 
@@ -79,6 +91,30 @@ namespace CsProjToVs2017Upgrader
             Console.WriteLine("\t\t-g|--generate   Generate new .NetStandard csproj files.");
             Console.WriteLine("\t\t-u|--upgraderef   Just update legacy csproj nuget packages to new VS2017 packagereference format.");
             Console.WriteLine();
+        }
+
+
+        static string GetDestDir()
+        {
+            var destDir = Path.Combine(Path.GetTempPath(), "VS2017_UpgradedReferences");
+            if (!Directory.Exists(destDir))
+                Directory.CreateDirectory(destDir);
+
+            return destDir;
+        }
+
+        static string GetFileDestPath(string srcProjPath, string destDir)
+        {
+            return Path.Combine(destDir, Path.GetFileName(srcProjPath));
+        }
+
+        static void UpgradeReferences(string destDir, IEnumerable<ProjectMeta> projects)
+        {
+            foreach(var p in projects)
+            {
+                var destFile = GetFileDestPath(p.ProjectFilePath, destDir);
+
+            }
         }
 
         static void GenerateUpgrades(IEnumerable<ProjectMeta> projects)
