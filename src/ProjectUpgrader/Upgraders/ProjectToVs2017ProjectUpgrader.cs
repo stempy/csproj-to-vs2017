@@ -25,10 +25,22 @@ namespace ProjectUpgrader.Upgraders
             _xmlHelpers = new ProjectPackageReferenceXmlHelpers();
         }
 
-        public string UpgradeProjectFile(string srcProjectFile)
+        public string UpgradeProjectFile(string srcProjectFile, string projFileDest = null)
         {
-            var projFileDest = Path.Combine(Path.GetDirectoryName(srcProjectFile), 
-                                            Path.GetFileName(srcProjectFile));
+            if (string.IsNullOrEmpty(projFileDest))
+            {
+                projFileDest = Path.Combine(Path.GetDirectoryName(srcProjectFile),
+                                                Path.GetFileName(srcProjectFile));
+
+                // write xml file
+                var outputDir = Path.Combine(Path.GetTempPath(), "Cs2017ProjectUpgrader");
+                projFileDest = Path.Combine(outputDir,
+                                        Path.GetFileNameWithoutExtension(projFileDest)
+                                        + Path.DirectorySeparatorChar
+                                        + Path.GetFileName(projFileDest));
+
+            }
+
 
             var projInfo = _projectReader.LoadProjectFile(srcProjectFile);
 
@@ -80,16 +92,11 @@ namespace ProjectUpgrader.Upgraders
                 root.Add(i);
             }
 
-            // write xml file
-            var outputDir = Path.Combine(Path.GetTempPath(), "Cs2017ProjectUpgrader");
-            var destFile = Path.Combine(outputDir, 
-                                    Path.GetFileNameWithoutExtension(projFileDest)
-                                    +Path.DirectorySeparatorChar
-                                    +Path.GetFileName(projFileDest));
-            Console.WriteLine(destFile);
+            
+            Console.WriteLine(projFileDest);
 
-            WriteNewCsProjectFile(srcProjectFile, destFile, root);
-            return destFile;
+            WriteNewCsProjectFile(srcProjectFile, projFileDest, root);
+            return projFileDest;
         }
 
      
