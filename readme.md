@@ -12,6 +12,10 @@ Usage:
 
 ```sh
 src\CsProjToVs2017Upgrader\bin\Release\publishoutput\CsProjToVs2017Upgrader.exe [-g|--generate | -u|--upgraderef] "solutionfile1.sln" "solutionfile2.sln" "projectfile.csproj" [sln3,sln4,...]
+
+or shortcut
+
+src\CsProjToVs2017Upgrader\run.cmd [-g|--generate | -u|--upgraderef] "solutionfile1.sln" "solutionfile2.sln" "projectfile.csproj" [sln3,sln4,...]
 ``` 
 
 Just specifying the solution files will just anaylize project to determine binary/project/nuget references. Currently outputs to folder(s) in %TEMP% dir.
