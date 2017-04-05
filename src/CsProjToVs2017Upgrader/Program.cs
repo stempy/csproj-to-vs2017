@@ -10,6 +10,7 @@ using ProjectUpgrader.Upgraders;
 
 namespace CsProjToVs2017Upgrader
 {
+
     class Program
     {
         static ILoggerFactory loggerFactory;
@@ -81,18 +82,22 @@ namespace CsProjToVs2017Upgrader
 
         private static void ProcessCommandLineArgs(ref string[] args, ref bool generateUpgrades, ref bool upgradeReferences)
         {
-            if (args.Contains("--generate") || args.Contains("-g"))
-            {
-                generateUpgrades = true;
-                args = args.Where(m => m != "-g").ToArray();
-                args = args.Where(m => m != "--generate").ToArray();
-            }
+            var gen = SimpleCommandParser.ParseOption("g", "generate",ref args);
+            var upd = SimpleCommandParser.ParseOption("u", "upgraderefs", ref args);
 
-            if (args.Contains("--upgraderefs") || args.Contains("-u"))
+            upgradeReferences = !string.IsNullOrEmpty(upd);
+            generateUpgrades = !string.IsNullOrEmpty(gen);
+
+            if (upgradeReferences && generateUpgrades)
             {
-                upgradeReferences = true;
-                generateUpgrades = false;
-                args = args.Where(m => m != "-u" && m != "--upgraderefs").ToArray();
+                Console.WriteLine("Error: unable to use both upgrade (-u) and generate (-g) switches");
+
+                if (Debugger.IsAttached)
+                {
+                    Console.ReadKey();
+                }
+
+                Environment.Exit(1);
             }
         }
 
