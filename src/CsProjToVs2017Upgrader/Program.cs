@@ -33,11 +33,20 @@ namespace CsProjToVs2017Upgrader
 
 
             bool generateUpgrades = false;
+            bool upgradeReferences = false;
+
             if (args.Contains("--generate") || args.Contains("-g"))
             {
                 generateUpgrades = true;
                 args = args.Where(m => m != "-g").ToArray();
                 args = args.Where(m => m != "--generate").ToArray();
+            }
+
+            if (args.Contains("--upgraderefs") || args.Contains("-u"))
+            {
+                upgradeReferences = true;
+                generateUpgrades = false;
+                args = args.Where(m => m != "-u" && m != "--upgraderefs").ToArray();
             }
 
 
@@ -64,7 +73,12 @@ namespace CsProjToVs2017Upgrader
         static void Usage()
         {
             Console.WriteLine("Old Csproj to VS2017 Upgrader\n=============================\nUsage:");
-            Console.WriteLine("\tCsProjToVs2017Upgrader [-g|--generate] slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
+
+
+            Console.WriteLine("\tCsProjToVs2017Upgrader [-g|--generate | -u|-upgraderefs] slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
+            Console.WriteLine("\t\t-g|--generate   Generate new .NetStandard csproj files.");
+            Console.WriteLine("\t\t-u|--upgraderef   Just update legacy csproj nuget packages to new VS2017 packagereference format.");
+            Console.WriteLine();
         }
 
         static void GenerateUpgrades(IEnumerable<ProjectMeta> projects)

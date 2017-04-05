@@ -1,7 +1,6 @@
 ﻿using CsProjToVs2017Upgrader;
 using CsProjToVs2017Upgrader.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,13 +16,14 @@ namespace ProjectUpgrader.Upgraders
     {
         IProjectFileReader _projectReader;
         ReferenceToPackageReferenceUpgrader _nugetRefUpdater;
+        ProjectPackageReferenceXmlHelpers _xmlHelpers;
 
         public ProjectToVs2017ProjectUpgrader()
         {
             _projectReader = new ProjectFileReader();
             _nugetRefUpdater = new ReferenceToPackageReferenceUpgrader();
+            _xmlHelpers = new ProjectPackageReferenceXmlHelpers();
         }
-
 
         public string UpgradeProjectFile(string srcProjectFile)
         {
@@ -31,11 +31,6 @@ namespace ProjectUpgrader.Upgraders
                                             Path.GetFileName(srcProjectFile));
 
             var projInfo = _projectReader.LoadProjectFile(srcProjectFile);
-
-            //if (projInfo.ProjectType != ProjectType.LegacyClassLibrary)
-            //{
-            //    throw new Exception($"{srcProjectFile} is not a legacy class library. Cannot update");
-            //}
 
             // get binary references split up into nuget and non
             var references = projInfo.ProjectReferences.Where(m => m.ReferenceType == ProjectReferenceType.Reference);
@@ -57,36 +52,28 @@ namespace ProjectUpgrader.Upgraders
             // <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
             var projectRefs = projInfo.ProjectReferences.Where(m => m.ReferenceType == ProjectReferenceType.ProjectReference);
 
-            var newFw = UpgradeTargetFramework(projInfo.TargetFrameworkVersion);
-
             // Create xml
             XElement root =
                 new XElement("Project", new XAttribute("Sdk", "Microsoft.NET.Sdk"));
 
-            
             // propertygroups
-            var propertyGroups = new XElement("PropertyGroup",
-                                    new XElement("TargetFramework", newFw));
-
             var props = CreatePropertyGroups(projInfo);
-            foreach(var p in props)
-            {
-                propertyGroups.Add(new XElement(p.Key, p.Value));
-            }
+            var propertyGroups = _xmlHelpers.CreatePropertyGroupsElement(props, UpgradeTargetFramework(projInfo.TargetFrameworkVersion));
+
 
             root.Add(propertyGroups);
 
             // build referencegroups
-            var projRefEl = CreateReferenceItems(projectRefs);
-            var binReflEl = CreateReferenceItems(binRefs);
-            var pkgRefEl = CreatePackageReferenceItems(newNugetPackageReferenes);
+            var projRefEl = _xmlHelpers.CreateReferenceItems(projectRefs);
+            var binReflEl = _xmlHelpers.CreateReferenceItems(binRefs);
+            var pkgRefEl = _xmlHelpers.CreatePackageReferenceItems(newNugetPackageReferenes);
 
             // add <ItemGroup> element with all references to project root
 
             var itemGroups = new List<XElement>();
-            itemGroups.Add(AddItemGroupReferences(projRefEl));
-            itemGroups.Add(AddItemGroupReferences(binReflEl));
-            itemGroups.Add(AddItemGroupReferences(pkgRefEl));
+            itemGroups.Add(_xmlHelpers.AddItemGroupReferences(projRefEl));
+            itemGroups.Add(_xmlHelpers.AddItemGroupReferences(binReflEl));
+            itemGroups.Add(_xmlHelpers.AddItemGroupReferences(pkgRefEl));
             foreach(var i in itemGroups)
             {
                 // add as separate itemgroups
@@ -105,15 +92,7 @@ namespace ProjectUpgrader.Upgraders
             return destFile;
         }
 
-        private XElement AddItemGroupReferences(IEnumerable<XElement> items)
-        {
-            var itemGroup = new XElement("ItemGroup");
-            foreach (var xel in items)
-            {
-                itemGroup.Add(xel);
-            }
-            return itemGroup;
-        }
+     
 
         private void WriteNewCsProjectFile(string srcFile,string destFile, XElement rootElement)
         {
@@ -134,39 +113,9 @@ namespace ProjectUpgrader.Upgraders
                 fs.Flush();
             }
 
-
-            
-
-
             var oldCsProj = Path.GetFileNameWithoutExtension(srcFile) + "_old.csproj";
             File.Copy(srcFile, Path.Combine(dir, oldCsProj),true);
         }
-
-
-        private IEnumerable<XElement> CreatePackageReferenceItems(IEnumerable<PackageReference> refs)
-        {
-            var pkgRefs = refs.Select(y => new XElement("PackageReference",
-                                            new XAttribute("Include", y.Name),
-                                            new XAttribute("Version",y.Version))
-                                     );
-            return pkgRefs;
-        }
-
-        private IEnumerable<XElement> CreateReferenceItems(IEnumerable<ProjectReference> refs)
-        {
-            var projRefs = refs
-                            .Where(y=>y.ReferenceType==ProjectReferenceType.ProjectReference)
-                            .Select(r => new XElement("ProjectReference",
-                                            new XAttribute("Include", r.Include)));
-
-            var binRef = refs.Where(y => y.ReferenceType == ProjectReferenceType.Reference)
-                             .Select(r => new XElement("Reference", 
-                                            new XAttribute("Include",r.Name)));
-
-            var allRefs = projRefs.Concat(binRef);
-            return allRefs;
-        }
-
 
         private IEnumerable<PackageReference> GetFilteredPackageReferences(IEnumerable<ProjectReference> projRefs, IEnumerable<PackageReference> existingPackRefs)
         {

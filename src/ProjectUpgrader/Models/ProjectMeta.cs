@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,5 +32,22 @@ namespace CsProjToVs2017Upgrader.Models
         public ProjectType ProjectType { get; set; }
 
         public string BelongsToSolutionFile { get; set; }
+
+
+        public IEnumerable<ProjectReference> GetNugetRefs()
+        {
+            return ProjectReferences?.Where(u => PackageReferences.Any(i => i.Name == u.Name));
+        }
+
+        public IEnumerable<ProjectReference> GetProjectRefs()
+        {
+            return ProjectReferences?.Where(u => u.ReferenceType==ProjectReferenceType.ProjectReference);
+        }
+
+        public IEnumerable<ProjectReference> GetBinaryRefs()
+        {
+            return ProjectReferences?.Where(u => u.ReferenceType == ProjectReferenceType.Reference);
+        }
     }
+
 }

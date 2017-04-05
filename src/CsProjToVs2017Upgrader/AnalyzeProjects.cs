@@ -84,19 +84,23 @@ namespace CsProjToVs2017Upgrader
         {
             var filename = Path.GetFileName(meta.ProjectFilePath);
 
-            var line = $"Project:{filename} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}]";
-            // get reference lists
-            var refListNotNuget = meta.ProjectReferences.Where(u => !meta.PackageReferences.Any(i => i.Name == u.Name));
-            var binaryRef = refListNotNuget.Where(u => u.ReferenceType == ProjectReferenceType.Reference);
-            var projRef = refListNotNuget.Except(binaryRef);
+            // C# 7 local function to get reflist string
+            IEnumerable<string> GetRefListString(IEnumerable<ProjectReference> items)
+            {
+                return items.Select(m => $"\t{m.Name} => [{m.ReferenceType}:{m.Version}] {m.HintPath}");
+            }
 
-            var binRefList = GetRefListString(binaryRef);
-            var projRefList = GetRefListString(projRef);
+            // get reference lists
+            var binRefList = GetRefListString(meta.GetBinaryRefs());
+            var binNugetList = GetRefListString(meta.GetNugetRefs());
+            var projRefList = GetRefListString(meta.GetProjectRefs());
 
             //var refList = refListNotNuget.Select(m => $"\t{m.Name} => {m.Version} [{m.ReferenceType}]");
             var packageList = meta.PackageReferences.Select(m => $"\t{m.Name} => {m.Version}");
+            var line = $"Project:{filename} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}-{meta.TargetFrameworkVersion}]";
             Console.WriteLine(line);
             DisplayReferenceList("Binary References", binRefList);
+            DisplayReferenceList("Binary References (Nuget)", binNugetList);
             DisplayReferenceList("Project References", projRefList);
             DisplayReferenceList("Packages", packageList);
             Console.WriteLine();
@@ -109,11 +113,6 @@ namespace CsProjToVs2017Upgrader
                 Console.WriteLine(title + ":");
                 Console.WriteLine(string.Join("\n", strArr));
             }
-        }
-
-        IEnumerable<string> GetRefListString(IEnumerable<ProjectReference> items)
-        {
-            return items.Select(m => $"\t{m.Name} => [{m.ReferenceType}:{m.Version}] {m.HintPath}");
         }
     }
 }
