@@ -18,7 +18,6 @@ namespace CsProjToVs2017Upgrader
         static IProjectToVs2017ReferenceOnlyUpgrader _refUpgrader;
         static ProjectAnalyzer _projectAnalyzer;
 
-
         static void Main(string[] args)
         {
             //var builder = new ConfigurationBuilder()
@@ -36,8 +35,8 @@ namespace CsProjToVs2017Upgrader
 
             bool generateUpgrades = false;
             bool upgradeReferences = false;
-
-            ProcessCommandLineArgs(ref args, ref generateUpgrades, ref upgradeReferences);
+            bool overwriteSource=false;
+            ProcessCommandLineArgs(ref args, ref generateUpgrades, ref upgradeReferences, ref overwriteSource);
 
             foreach (var arg in args)
             {
@@ -51,7 +50,7 @@ namespace CsProjToVs2017Upgrader
                 if (upgradeReferences)
                 {
                     var dir = PathHelpers.GetDestDir();
-                    UpgradeReferences(dir, projectsAnalyzed,slnFile);
+                    UpgradeReferences(dir, projectsAnalyzed,slnFile, overwriteSource);
                 } else
                 {
                     // -g generate
@@ -80,13 +79,18 @@ namespace CsProjToVs2017Upgrader
             _projectAnalyzer = new ProjectAnalyzer(loggerFactory.CreateLogger<ProjectAnalyzer>());
         }
 
-        private static void ProcessCommandLineArgs(ref string[] args, ref bool generateUpgrades, ref bool upgradeReferences)
+        private static void ProcessCommandLineArgs(ref string[] args, ref bool generateUpgrades, ref bool upgradeReferences, ref bool overwriteSource)
         {
             var gen = SimpleCommandParser.ParseOption("g", "generate",ref args);
             var upd = SimpleCommandParser.ParseOption("u", "upgraderefs", ref args);
+            var overwriteSourceOpt = SimpleCommandParser.ParseOption("s", "source", ref args);
+
+
 
             upgradeReferences = !string.IsNullOrEmpty(upd);
             generateUpgrades = !string.IsNullOrEmpty(gen);
+            overwriteSource = !string.IsNullOrEmpty(overwriteSourceOpt);
+
 
             if (upgradeReferences && generateUpgrades)
             {
@@ -106,21 +110,25 @@ namespace CsProjToVs2017Upgrader
             Console.WriteLine("Old Csproj to VS2017 Upgrader\n=============================\nUsage:");
 
 
-            Console.WriteLine("\tCsProjToVs2017Upgrader [-g|--generate | -u|-upgraderefs] slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
+            Console.WriteLine("\tCsProjToVs2017Upgrader [-g|--generate | -u|-upgraderefs] [-s|--source] slnfile1.sln slnfile2.sln projectfile.csproj projectfile2.csproj");
             Console.WriteLine("\t\t-g|--generate   Generate new .NetStandard csproj files.");
             Console.WriteLine("\t\t-u|--upgraderef   Just update legacy csproj nuget packages to new VS2017 packagereference format.");
+            Console.WriteLine("\t\t-s|--source   Overwrite Source csproj files...WARNING this modifies source .csproj files and packages.config files.");
             Console.WriteLine();
         }
 
-        static void UpgradeReferences(string destDir, IEnumerable<ProjectMeta> projects, string slnFile)
+        static void UpgradeReferences(string destDir, IEnumerable<ProjectMeta> projects, string slnFile, bool overwriteSource)
         {
-            destDir = CopySlnFile(slnFile, destDir);
+            if (!overwriteSource)
+                destDir = CopySlnFile(slnFile, destDir);
 
             // now process csproj files and save to destination instead of overwriting
             foreach (var p in projects)
             {
-                var destProjFile = PathHelpers.GetFileDestPath(p.ProjectFilePath, destDir);
-                _refUpgrader.UpgradeProjectFile(p.ProjectFilePath, false, destProjFile);
+                var destProjFile = overwriteSource? p.ProjectFilePath
+                                        : PathHelpers.GetFileDestPath(p.ProjectFilePath, destDir);
+
+                _refUpgrader.UpgradeProjectFile(p.ProjectFilePath, overwriteSource, destProjFile);
             }
         }
 

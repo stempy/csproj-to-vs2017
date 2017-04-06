@@ -12,7 +12,7 @@ Usage:
 
 shortcut
 ```sh
-run.cmd [-g|--generate | -u|--upgraderef] "solutionfile1.sln" "solutionfile2.sln" "projectfile.csproj" [sln3,sln4,...]
+run.cmd [-g|--generate | -u|--upgraderef] [-s|--source] "solutionfile1.sln" "solutionfile2.sln" "projectfile.csproj" [sln3,sln4,...]
 ```
 
 Or actual exe that is built
@@ -28,3 +28,4 @@ There are two approaches:
 
 2. `-g|--generate` Generate completely new csproj files for .NETStandard approach. This will require more work. see http://www.natemcmaster.com/blog/2017/03/09/vs2015-to-vs2017-upgrade/
 
+3. `-s|--source` *WARNING*: Overwrite source .csproj and packages.config files, this directly modifies original .csproj files. backup, or use source control before running with this switch.
