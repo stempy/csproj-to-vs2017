@@ -101,6 +101,12 @@ namespace ProjectUpgrader.Upgraders
                 // Add new package references to xdoc
                 var newItemGroup = _xmlHelpers.AddItemGroupReferences(newPackageReferences);
                 doc.Element(_projectNameSpace+"Project").Add(newItemGroup);
+
+                var destPackagesConfig = Path.Combine(Path.GetDirectoryName(destProjectFile), Path.GetFileName(packagesConfigPath));
+                if (File.Exists(destPackagesConfig))
+                {
+                    File.Delete(destPackagesConfig);
+                }
             }
             
             WriteNewCsProjectFile(srcProjectFile, destProjectFile, doc);
