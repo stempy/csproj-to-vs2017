@@ -140,8 +140,8 @@ namespace CsProjToVs2017Upgrader
                 var hintPath = e.Elements(CsProjxmlns + "HintPath").FirstOrDefault();
                 var specificVersion = e.Elements(CsProjxmlns + "SpecificVersion").FirstOrDefault();
                 var isPrivate = e.Elements(CsProjxmlns + "Private").FirstOrDefault() != null;
-                
-                references.Add(new ProjectReference()
+
+                var pr = new ProjectReference()
                 {
                     //ReferenceElement = referenceElement,
                     ReferenceType = refType,
@@ -151,7 +151,13 @@ namespace CsProjToVs2017Upgrader
                     HintPath = hintPath?.Value,
                     IsPrivate = isPrivate,
                     IsSpecificVersion = specificVersion != null && (specificVersion.Value == "True" ? true : false)
-                });
+                };
+                if (pr.IsNugetPackage && pr.ReferenceType != ProjectReferenceType.PackageReference)
+                {
+                    pr.ReferenceType = ProjectReferenceType.LegacyNugetReference;
+                }
+
+                references.Add(pr);
             }
 
             return references;

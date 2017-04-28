@@ -35,6 +35,7 @@ namespace CsProjToVs2017Upgrader.Models
     {
         Reference,
         ProjectReference,
+        LegacyNugetReference,
         PackageReference
     }
 }
