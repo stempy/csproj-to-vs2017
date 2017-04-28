@@ -34,6 +34,7 @@ namespace CsProjToVs2017Upgrader.Models
     public enum ProjectReferenceType
     {
         Reference,
-        ProjectReference
+        ProjectReference,
+        PackageReference
     }
 }

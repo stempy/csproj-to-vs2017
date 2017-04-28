@@ -94,8 +94,10 @@ namespace CsProjToVs2017Upgrader
             var source = Path.GetFileName(file);
             var references = GetCsProjectReferences(doc, source, "Reference");
             var projReferences = GetCsProjectReferences(doc, source, "ProjectReference");
+            var packageReferences = GetCsProjectReferences(doc, source, "PackageReference"); // new VS2017 package reference
             packages.AddRange(references);
             packages.AddRange(projReferences);
+            packages.AddRange(packageReferences);
             return packages;
         }
 
