@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
+using System.Text;
 
 namespace CsProjToVs2017Upgrader
 {
@@ -61,17 +63,33 @@ namespace CsProjToVs2017Upgrader
             if (_projectTypeDictionary == null)
             {
                 _projectTypeDictionary = new Dictionary<Guid, string>();
-                var ptypesContent = File.ReadLines(@"visual_studio_project_type_guids_list.csv");
+
+                var asm = Assembly.GetEntryAssembly();
+                var resStream =
+                    asm.GetManifestResourceStream("CsProjToVs2017Upgrader.visual_studio_project_type_guids_list.csv");
+
+                string[] lines;
+                using (var reader = new StreamReader(resStream, Encoding.UTF8))
+                {
+                    var res = reader.ReadToEnd();
+                    lines = res.Split('\n');
+                }
+                var ptypesContent = lines.Select(y=>y.TrimEnd(new char[]{'\r'}));
+
+                //var ptypesContent = File.ReadLines(@"visual_studio_project_type_guids_list.csv");
                 foreach (var line in ptypesContent)
                 {
-                    var lineArr = line.Split(',');
-                    var desc = lineArr[0];
-                    var guidStr = lineArr[1];
-                    if (!string.IsNullOrEmpty(guidStr))
+                    if (!string.IsNullOrWhiteSpace(line))
                     {
-                        var g = Guid.Parse(guidStr);
-                        if (!_projectTypeDictionary.ContainsKey(g))
-                            _projectTypeDictionary.Add(g, desc);
+                        var lineArr = line.Split(',');
+                        var desc = lineArr[0];
+                        var guidStr = lineArr[1];
+                        if (!string.IsNullOrEmpty(guidStr))
+                        {
+                            var g = Guid.Parse(guidStr);
+                            if (!_projectTypeDictionary.ContainsKey(g))
+                                _projectTypeDictionary.Add(g, desc);
+                        }
                     }
                 }
             }
