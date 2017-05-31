@@ -30,7 +30,7 @@ namespace ProjectUpgrader.Models
         public string OutputType { get; set; }
         public ProjectType ProjectType { get; set; }
 
-        public string BelongsToSolutionFile { get; set; }
+        public string BelongsToSolutionFile { get; set; } = String.Empty;
 
 
         public IEnumerable<ProjectReference> GetNugetRefs()
