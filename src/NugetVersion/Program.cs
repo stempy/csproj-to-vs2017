@@ -41,7 +41,12 @@ namespace NugetVersion
             var projectGrps = GetProjectFileGroups(slnOrProj);
 
             // now process the groups
-            PackageReferenceTools.ProcessProjectGroups(projectGrps, packageName, newVersion);
+            var fndProjects=PackageReferenceTools.ProcessProjectGroups(projectGrps, packageName, newVersion);
+
+
+
+            
+
 
             // end
             WaitDebugger();

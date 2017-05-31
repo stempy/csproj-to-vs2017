@@ -36,7 +36,7 @@ namespace ProjectUpgrader.ProjectReader
             return p;
         }
 
-        private IEnumerable<PackageReference> GetPackageReferencesFromProject(XDocument doc, string file)
+        public IEnumerable<PackageReference> GetPackageReferencesFromProject(XDocument doc, string file)
         {
             var xmlHelper = new ProjectPackageReferenceXmlHelpers();
             var packageReferenceEl = xmlHelper.GetPackageReferences(doc);

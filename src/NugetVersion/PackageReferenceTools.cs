@@ -8,6 +8,9 @@ namespace NugetVersion
 {
     public class PackageReferenceTools
     {
+        //private readonly SetProjectPackageReferenceVersions _setProjectPackageReferenceVersions = new SetProjectPackageReferenceVersions();
+        
+        
         // If you want to implement both "*" and "?"
         private static string WildCardToRegular(string value)
         {
@@ -19,10 +22,11 @@ namespace NugetVersion
         /// Process the project groups by sln (or project files)
         /// </summary>
         /// <param name="projectGrps"></param>
-        public void ProcessProjectGroups(Dictionary<string, IEnumerable<ProjectMeta>> projectGrps, string packageName, string newVersion)
+        public IDictionary<string,IEnumerable<ProjectMeta>> ProcessProjectGroups(Dictionary<string, IEnumerable<ProjectMeta>> projectGrps, string packageName, string newVersion)
         {
             var fndProjectsWithVersion = FindSlnAndProjectsMatchingCriteria(projectGrps, packageName);
             var nugetCompare = new NugetVersionCompareDictionary();
+
             foreach (var projectGrp in fndProjectsWithVersion)
             {
                 var key = projectGrp.Key;
@@ -38,9 +42,18 @@ namespace NugetVersion
                     foreach (var pkg in pkgs)
                     {
                         var name = pkg.Name;
-                        var ver = pkg.Version;
+                        var ver = pkg.Version.Trim();
+                        string newVerStr = string.Empty;
 
-                        Console.WriteLine($"\t\t{name} = {ver}");
+                        if (!string.IsNullOrEmpty(newVersion))
+                        {
+                            newVersion = newVersion.Trim();
+                            if (newVersion != ver)
+                            {
+                                newVerStr = " >>> " + newVersion;
+                            }
+                        }
+                        Console.WriteLine($"\t\t{name} = {ver}{newVerStr}");
                         if (!nugetCompare.ContainsKey(name))
                         {
                             nugetCompare.Add(name);
@@ -51,17 +64,39 @@ namespace NugetVersion
                 }
             }
 
-            foreach (var k in nugetCompare)
+
+            if (!string.IsNullOrEmpty(newVersion))
             {
-                Console.WriteLine($"{k.Key}");
-                foreach (var pair in k.Value.ProjectVersionDictionary)
+                Console.WriteLine("================================================================================");
+                Console.WriteLine($"Update Version to {newVersion} Process:");
+                Console.WriteLine("================================================================================");
+
+                // update to new version
+                foreach (var p in fndProjectsWithVersion)
                 {
-                    Console.WriteLine($"\t{pair.Key} = {pair.Value}");
+                    var key = p.Key;
+                    var items = p.Value;
+                    Console.WriteLine(key);
+                    foreach (var projectMeta in items)
+                    {
+                        Console.WriteLine($"\t{projectMeta.AssemblyName}");
+                    }
                 }
 
-                //var d = k.Value.CompareVersions();
-
+                Console.WriteLine("================================================================================");
             }
+            //foreach (var k in nugetCompare)
+            //{
+            //    Console.WriteLine($"{k.Key}");
+            //    foreach (var pair in k.Value.ProjectVersionDictionary)
+            //    {
+            //        Console.WriteLine($"\t{pair.Key} = {pair.Value}");
+            //    }
+
+            //    //var d = k.Value.CompareVersions();
+
+            //}
+            return fndProjectsWithVersion;
         }
 
         /// <summary>
@@ -70,7 +105,7 @@ namespace NugetVersion
         /// <param name="pr"></param>
         /// <param name="packageNameSpec"></param>
         /// <returns></returns>
-        private IEnumerable<PackageReference> FilterPackageReferences(IEnumerable<PackageReference> pr, string packageNameSpec)
+        public IEnumerable<PackageReference> FilterPackageReferences(IEnumerable<PackageReference> pr, string packageNameSpec)
         {
             if (packageNameSpec.Contains("*") || packageNameSpec.Contains("?"))
             {
