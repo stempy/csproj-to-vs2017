@@ -86,6 +86,10 @@ namespace ProjectUpgrader.Upgraders
             return doc.Descendants(_projectNameSpace + "Reference");
         }
 
+        public IEnumerable<XElement> GetPackageReferences(XDocument doc)
+        {
+            return doc.Descendants(_projectNameSpace + "PackageReference");
+        }
 
         public IEnumerable<XElement> CreatePackageReferenceItems(IEnumerable<PackageReference> refs)
         {

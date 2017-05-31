@@ -9,6 +9,8 @@ namespace NugetVersion
 {
     class Program
     {
+        static readonly PackageReferenceTools PackageReferenceTools = new PackageReferenceTools();
+
         static void Main(string[] args)
         {
             if (!args.Any())
@@ -39,35 +41,18 @@ namespace NugetVersion
             var projectGrps = GetProjectFileGroups(slnOrProj);
 
             // now process the groups
-            ProcessProjectGroups(projectGrps, packageName, newVersion);
+            var fndProjects=PackageReferenceTools.ProcessProjectGroups(projectGrps, packageName, newVersion);
+
+
+
+            
+
 
             // end
             WaitDebugger();
         }
 
-        /// <summary>
-        /// Process the project groups by sln (or project files)
-        /// </summary>
-        /// <param name="projectGrps"></param>
-        private static void ProcessProjectGroups(Dictionary<string, IEnumerable<ProjectMeta>> projectGrps, string packageName, string newVersion)
-        {
-            foreach (var projectGrp in projectGrps)
-            {
-                var key = projectGrp.Key;
-                var items = projectGrp.Value;
-                Console.WriteLine(key);
-                foreach (var projectMeta in items)
-                {
-                    Console.WriteLine($"\t{projectMeta.AssemblyName}");
-                    var pr = projectMeta.PackageReferences;
-                    var pkgs = string.IsNullOrEmpty(packageName)? pr: pr.Where(u => u.Name.StartsWith(packageName));
-                    foreach (var pkg in pkgs)
-                    {
-                        Console.WriteLine($"\t\t{pkg}");
-                    }
-                }
-            }
-        }
+       
 
         private static Dictionary<string, IEnumerable<ProjectMeta>> GetProjectFileGroups(string slnOrProj)
         {

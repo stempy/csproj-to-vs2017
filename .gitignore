@@ -251,3 +251,4 @@ paket-files/
 .idea/
 *.sln.iml
 src/CsProjToVs2017Upgrader/Properties/launchSettings.json
+src/NugetVersion/Properties/launchSettings.json
