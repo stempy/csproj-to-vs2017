@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using ProjectUpgrader.Models;
+using ProjectUpgrader.Upgraders;
 
 namespace ProjectUpgrader.ProjectReader
 {
@@ -26,9 +27,31 @@ namespace ProjectUpgrader.ProjectReader
             p = InitMetaRoot(p, doc);
 
             p.ProjectReferences = GetProjectReferences(doc, file);
-            p.PackageReferences = GetPackageReferences(file);
+
+            var legacyPackages = GetPackageReferencesFromPackagesConfigFile(file); // get legacy packages
+            var packageReferencePackages = GetPackageReferencesFromProject(doc, file);
+
+            p.PackageReferences = legacyPackages.Concat(packageReferencePackages);
 
             return p;
+        }
+
+        private IEnumerable<PackageReference> GetPackageReferencesFromProject(XDocument doc, string file)
+        {
+            var xmlHelper = new ProjectPackageReferenceXmlHelpers();
+            var packageReferenceEl = xmlHelper.GetPackageReferences(doc);
+            var pr = new List<PackageReference>();
+            foreach (XElement e in packageReferenceEl)
+            {
+                var inc = e.Attribute("Include").Value;
+                var version = e.Elements(CsProjxmlns + "Version").FirstOrDefault()?.Value;
+                pr.Add(new PackageReference()
+                {
+                    Name = inc,
+                    Version = version
+                });
+            }
+            return pr;
         }
 
         /// <summary>
@@ -36,7 +59,7 @@ namespace ProjectUpgrader.ProjectReader
         /// </summary>
         /// <param name="projectFile"></param>
         /// <returns></returns>
-        private IEnumerable<PackageReference> GetPackageReferences(string projectFile)
+        private IEnumerable<PackageReference> GetPackageReferencesFromPackagesConfigFile(string projectFile)
         {
             var packagePath = Path.GetDirectoryName(projectFile);
             var packageFile = Path.Combine(packagePath, "packages.config");

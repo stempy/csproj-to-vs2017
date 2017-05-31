@@ -2,7 +2,7 @@
   "profiles": {
     "NugetVersion": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\_Codebucket\\ia\\ia_backend\\ia.reports\\src\\iAdviserApi.Api.sln\",\"C:\\_Codebucket\\ia\\ia_backend\\iadviserweb2\\Websites\\Ia.Api\\Ia.Api.csproj\" Ia.*.Config"
+      "commandLineArgs": "\"C:\\_Codebucket\\ia\\ia_backend\\ia.reports\\src\\iAdviserApi.Api.sln\",\"C:\\_Codebucket\\ia\\ia_backend\\iadviserweb2\\Websites\\iAdviserWebSites.sln\" Ia.Domain.*"
     }
   }
 }

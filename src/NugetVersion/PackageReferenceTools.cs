@@ -32,7 +32,7 @@ namespace NugetVersion
                 {
                     Console.WriteLine($"\t{projectMeta.AssemblyName}");
                     var pr = projectMeta.PackageReferences;
-                    var pkgs = string.IsNullOrEmpty(packageName) ? pr : Enumerable.Where<PackageReference>(pr, u => u.Name.StartsWith(packageName));
+                    var pkgs = string.IsNullOrEmpty(packageName) ? pr : FilterPackageReferences(pr, packageName);
                     foreach (var pkg in pkgs)
                     {
                         Console.WriteLine($"\t\t{pkg}");
