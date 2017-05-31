@@ -48,8 +48,7 @@ namespace ProjectUpgrader
             var isSln = filePath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase);
             var isProj = filePath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase);
             var slnType = isSln ? "Solution" : isProj ? "Project" : "none";
-            Console.Write($"File: \"{filePath}\"");
-            Console.Write($" FileType:{slnType}");
+            Console.WriteLine($"File: \"{filePath}\" FileType:{slnType}");
 
             var proj = new List<ProjectMeta>();
             if (isSln)
