@@ -80,6 +80,7 @@ namespace NugetVersion
                     var pkgs = string.IsNullOrEmpty(packageName) ? pr : FilterPackageReferences(pr, packageName);
                     if (pkgs.Any())
                     {
+                        projectMeta.PackageReferences = pkgs;
                         projectsWithPackages.Add(projectMeta);
                     }
                 }
