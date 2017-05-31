@@ -22,7 +22,7 @@ namespace NugetVersion
         public void ProcessProjectGroups(Dictionary<string, IEnumerable<ProjectMeta>> projectGrps, string packageName, string newVersion)
         {
             var fndProjectsWithVersion = FindSlnAndProjectsMatchingCriteria(projectGrps, packageName);
-
+            var nugetCompare = new NugetVersionCompareDictionary();
             foreach (var projectGrp in fndProjectsWithVersion)
             {
                 var key = projectGrp.Key;
@@ -30,14 +30,37 @@ namespace NugetVersion
                 Console.WriteLine((string)key);
                 foreach (var projectMeta in items)
                 {
-                    Console.WriteLine($"\t{projectMeta.AssemblyName}");
+                    var projectAsmName = projectMeta.AssemblyName;
+
+                    Console.WriteLine($"\t{projectAsmName}");
                     var pr = projectMeta.PackageReferences;
                     var pkgs = string.IsNullOrEmpty(packageName) ? pr : FilterPackageReferences(pr, packageName);
                     foreach (var pkg in pkgs)
                     {
-                        Console.WriteLine($"\t\t{pkg}");
+                        var name = pkg.Name;
+                        var ver = pkg.Version;
+
+                        Console.WriteLine($"\t\t{name} = {ver}");
+                        if (!nugetCompare.ContainsKey(name))
+                        {
+                            nugetCompare.Add(name);
+                        }
+
+                        nugetCompare[name].ProjectVersionDictionary[projectAsmName] = ver;
                     }
                 }
+            }
+
+            foreach (var k in nugetCompare)
+            {
+                Console.WriteLine($"{k.Key}");
+                foreach (var pair in k.Value.ProjectVersionDictionary)
+                {
+                    Console.WriteLine($"\t{pair.Key} = {pair.Value}");
+                }
+
+                //var d = k.Value.CompareVersions();
+
             }
         }
 
