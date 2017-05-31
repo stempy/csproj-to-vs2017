@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CsProjToVs2017Upgrader.Models
+﻿namespace ProjectUpgrader.Models
 {
     public class ProjectReference
     {

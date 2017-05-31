@@ -1,10 +1,11 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using ProjectUpgrader.SolutionReader;
+﻿using ProjectUpgrader.SolutionReader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using ProjectUpgrader.Models;
+using ProjectUpgrader.ProjectReader;
 
 namespace CsProjToVs2017Upgrader
 {

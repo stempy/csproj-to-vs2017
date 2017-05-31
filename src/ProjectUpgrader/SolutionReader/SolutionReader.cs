@@ -1,11 +1,11 @@
-﻿using CsProjToVs2017Upgrader;
-using CsProjToVs2017Upgrader.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProjectUpgrader.Models;
+using ProjectUpgrader.ProjectReader;
 
 namespace ProjectUpgrader.SolutionReader
 {

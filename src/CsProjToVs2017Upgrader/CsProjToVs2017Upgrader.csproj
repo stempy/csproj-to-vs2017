@@ -21,6 +21,7 @@
     <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ProjectUpgrader.Models\ProjectUpgrader.Models.csproj" />
     <ProjectReference Include="..\ProjectUpgrader\ProjectUpgrader.csproj" />
   </ItemGroup>
   <ItemGroup>

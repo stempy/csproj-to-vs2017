@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CsProjToVs2017Upgrader.Models;
+using ProjectUpgrader.Models;
 
 namespace ProjectUpgrader.SolutionReader
 {
