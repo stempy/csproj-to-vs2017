@@ -32,6 +32,7 @@ namespace ProjectUpgrader.ProjectReader
                 {
                     Name = name,
                     Version = version,
+                    IsLegacyPackage = true
                 });
             }
             return packages;
