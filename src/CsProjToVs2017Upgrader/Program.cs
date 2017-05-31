@@ -3,9 +3,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using CsProjToVs2017Upgrader.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using ProjectUpgrader.Models;
 using ProjectUpgrader.Upgraders;
 
 namespace CsProjToVs2017Upgrader

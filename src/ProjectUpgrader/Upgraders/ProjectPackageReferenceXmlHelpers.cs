@@ -1,7 +1,7 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using ProjectUpgrader.Models;
 
 namespace ProjectUpgrader.Upgraders
 {

@@ -1,12 +1,11 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Xml.Linq;
-using System.Collections.Generic;
+using ProjectUpgrader.Models;
 
-namespace CsProjToVs2017Upgrader
+namespace ProjectUpgrader.ProjectReader
 {
     public class ProjectFileReader : IProjectFileReader
     {

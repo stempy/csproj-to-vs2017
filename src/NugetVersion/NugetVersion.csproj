@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="visual_studio_project_type_guids_list.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="visual_studio_project_type_guids_list.csv">
+      <CustomToolNamespace>CsProjToVs2017Upgrader</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectUpgrader.Models\ProjectUpgrader.Models.csproj" />
+    <ProjectReference Include="..\ProjectUpgrader\ProjectUpgrader.csproj" />
+  </ItemGroup>
+
+</Project>

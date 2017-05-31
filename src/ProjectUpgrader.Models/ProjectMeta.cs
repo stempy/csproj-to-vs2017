@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
-namespace CsProjToVs2017Upgrader.Models
+namespace ProjectUpgrader.Models
 {
     public class ProjectMeta
     {
@@ -31,7 +30,7 @@ namespace CsProjToVs2017Upgrader.Models
         public string OutputType { get; set; }
         public ProjectType ProjectType { get; set; }
 
-        public string BelongsToSolutionFile { get; set; }
+        public string BelongsToSolutionFile { get; set; } = String.Empty;
 
 
         public IEnumerable<ProjectReference> GetNugetRefs()

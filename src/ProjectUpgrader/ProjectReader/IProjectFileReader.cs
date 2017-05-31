@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
-using CsProjToVs2017Upgrader.Models;
+using ProjectUpgrader.Models;
 
-namespace CsProjToVs2017Upgrader
+namespace ProjectUpgrader.ProjectReader
 {
     public interface IProjectFileReader
     {
