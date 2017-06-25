@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>NugetVersion</id>
+    <version>$version$</version>
+    <title>NugetVersion</title>
+    <authors>Rob Stemp</authors>
+    <owners>Rob@stempnet.com</owners>
+    <projectUrl>https://github.com/stempy/csproj-to-vs2017</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Get NugetVersions for multiple slns and projects</description>
+    <releaseNotes>Package Creation.</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>nugetversion</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\netcoreapp1.1\win10-x64\*.*" target="tools" />
+  </files>
+</package>

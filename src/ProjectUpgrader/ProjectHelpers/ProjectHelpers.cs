@@ -1,8 +1,6 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Linq;
+using ProjectUpgrader.Models;
 
 namespace ProjectUpgrader.ProjectHelpers
 {

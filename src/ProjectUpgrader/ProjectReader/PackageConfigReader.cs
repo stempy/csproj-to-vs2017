@@ -1,10 +1,10 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using ProjectUpgrader.Models;
 
-namespace CsProjToVs2017Upgrader
+namespace ProjectUpgrader.ProjectReader
 {
     public class PackageConfigReader
     {
@@ -32,6 +32,7 @@ namespace CsProjToVs2017Upgrader
                 {
                     Name = name,
                     Version = version,
+                    IsLegacyPackage = true
                 });
             }
             return packages;

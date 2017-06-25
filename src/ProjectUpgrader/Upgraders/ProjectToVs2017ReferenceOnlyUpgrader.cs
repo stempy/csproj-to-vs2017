@@ -1,11 +1,11 @@
-﻿using CsProjToVs2017Upgrader;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using System.Linq;
 using System.Xml;
 using System;
+using ProjectUpgrader.ProjectReader;
 
 namespace ProjectUpgrader.Upgraders
 {

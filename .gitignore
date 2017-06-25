@@ -10,6 +10,8 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+/Build
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -251,3 +253,4 @@ paket-files/
 .idea/
 *.sln.iml
 src/CsProjToVs2017Upgrader/Properties/launchSettings.json
+src/NugetVersion/Properties/launchSettings.json

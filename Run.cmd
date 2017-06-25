@@ -1,9 +1,6 @@
 @echo off
 SETLOCAL
-set thisDir=%~dp0
-set thisDir=%thisDir:~0,-1%
-set outputPath=%thisDir%\src\CsProjToVs2017Upgrader\bin\release\publishoutput\CsProjToVs2017Upgrader.exe
-rem Run (build exe if needed)
-if not exist "%outputPath%" call "%thisDir%\BuildExe.cmd"
-"%outputPath%" %*
+call "%~dp0_setPublishOutput.cmd" CsProjToVs2017Upgrader
+if not exist "%publishOutputExe%" call "%~dp0BuildExe.cmd"
+"%publishOutputExe%" %*
 ENDLOCAL

@@ -1,7 +1,7 @@
-﻿using CsProjToVs2017Upgrader.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using ProjectUpgrader.Models;
 
 namespace ProjectUpgrader.Upgraders
 {
@@ -86,6 +86,10 @@ namespace ProjectUpgrader.Upgraders
             return doc.Descendants(_projectNameSpace + "Reference");
         }
 
+        public IEnumerable<XElement> GetPackageReferences(XDocument doc)
+        {
+            return doc.Descendants(_projectNameSpace + "PackageReference");
+        }
 
         public IEnumerable<XElement> CreatePackageReferenceItems(IEnumerable<PackageReference> refs)
         {

@@ -1,24 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using ProjectUpgrader.Models;
 
-namespace CsProjToVs2017Upgrader
+namespace ProjectUpgrader.ProjectReader
 {
-    public enum ProjectType
-    {
-        None,
-        LegacyConsole,
-        LegacyClassLibrary,
-        LegacyMvcApplication,
-
-        StandardClassLibary,
-        CoreMvc,
-        CoreConsole
-    }
-
     public enum ProjectOutputType
     {
         Exe,
@@ -65,8 +54,14 @@ namespace CsProjToVs2017Upgrader
                 _projectTypeDictionary = new Dictionary<Guid, string>();
 
                 var asm = Assembly.GetEntryAssembly();
+                var asmName = asm.GetName().Name;
+                var resName = $"{asmName}.visual_studio_project_type_guids_list.csv";
+
                 var resStream =
-                    asm.GetManifestResourceStream("CsProjToVs2017Upgrader.visual_studio_project_type_guids_list.csv");
+                    asm.GetManifestResourceStream(resName);
+
+                
+
 
                 string[] lines;
                 using (var reader = new StreamReader(resStream, Encoding.UTF8))

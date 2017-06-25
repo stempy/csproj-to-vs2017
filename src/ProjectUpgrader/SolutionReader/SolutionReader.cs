@@ -1,11 +1,11 @@
-﻿using CsProjToVs2017Upgrader;
-using CsProjToVs2017Upgrader.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using ProjectUpgrader.Models;
+using ProjectUpgrader.ProjectReader;
 
 namespace ProjectUpgrader.SolutionReader
 {
@@ -16,16 +16,17 @@ namespace ProjectUpgrader.SolutionReader
         protected const string SlnProjectReplace =
             "Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"";
 
-        /// <summary>
-        /// Get Project Items from .sln file
-        /// </summary>
-        /// <param name="slnFile"></param>
-        /// <returns></returns>
-        public IEnumerable<ProjectMeta> ParseProjectsInSolution(string slnFile)
+
+        public IEnumerable<string> GetProjectFilesInSolution(string slnFile)
         {
-            var Content = File.ReadAllText(slnFile);
+            var projList = GetBaseProjectMetaFromSln(slnFile, File.ReadAllText(slnFile));
+            return projList.Select(m => m.ProjectFilePath);
+        }
+
+        private IEnumerable<ProjectMeta> GetBaseProjectMetaFromSln(string slnFile,string slnFileContent)
+        {
             Regex projReg = new Regex(SlnProjectRegex, RegexOptions.Compiled);
-            var matches = projReg.Matches(Content).Cast<Match>();
+            var matches = projReg.Matches(slnFileContent).Cast<Match>();
             var Projects = matches.Select(x => new ProjectMeta()
             {
                 ProjectTypeGuid = Guid.Parse(x.Groups[1].Value),
@@ -35,8 +36,18 @@ namespace ProjectUpgrader.SolutionReader
                 ProjectGuid = Guid.Parse(x.Groups[5].Value),
                 BelongsToSolutionFile = slnFile
             }).ToList();
+            return Projects;
+        }
 
-
+        /// <summary>
+        /// Get Project Items from .sln file
+        /// </summary>
+        /// <param name="slnFile"></param>
+        /// <returns></returns>
+        public IEnumerable<ProjectMeta> ParseProjectsInSolution(string slnFile)
+        {
+            var Content = File.ReadAllText(slnFile);
+            var Projects = GetBaseProjectMetaFromSln(slnFile, Content).ToList();
             var projList = new List<ProjectMeta>();
             var projReader = new ProjectFileReader();
             foreach(var p in Projects)

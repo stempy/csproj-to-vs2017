@@ -1,0 +1,3 @@
+@echo off
+echo Building NugetVersion....
+call "%~dp0_buildExe.cmd" "%~dp0src\NugetVersion" NugetVersion

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CsProjToVs2017Upgrader</id>
+    <version>$version$</version>
+    <title>CsProjToVs2017Upgrader</title>
+    <authors>Rob Stemp</authors>
+    <owners>Rob@stempnet.com</owners>
+    <projectUrl>https://github.com/stempy/csproj-to-vs2017</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>CsProjToVs2017Upgrader for multiple slns and projects</description>
+    <releaseNotes>Package Creation.</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>CsProjToVs2017Upgrader</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\netcoreapp1.1\win10-x64\*.*" target="tools" />
+  </files>
+</package>
