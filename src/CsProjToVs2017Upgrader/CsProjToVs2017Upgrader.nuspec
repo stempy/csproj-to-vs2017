@@ -14,8 +14,9 @@
     <tags>CsProjToVs2017Upgrader</tags>
   </metadata>
   <files>
-    <file src="bin\$Configuration$\publishoutput\**\*.dll" target="tools" />
-    <file src="bin\$Configuration$\publishoutput\*.exe" target="tools" />
-    <file src="bin\$Configuration$\publishoutput\**\*.config" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.json" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.dll" target="tools" />
+    <file src="bin\$Configuration$\publishcore\*.exe" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.config" target="tools" />
   </files>
 </package>

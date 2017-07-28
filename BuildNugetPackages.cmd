@@ -9,15 +9,21 @@ if NOT exist "%buildDir%" md "%buildDir%"
 
 if "%config%"=="" set config=Release
 set version=
-rem build actual executables
-call "%thisDir%\BuildExe.cmd"
-call "%thisDir%\BuildNugetVersionExe.cmd"
 
-call :packProj "%thisDir%\src\CsProjToVs2017Upgrader"
-call :packProj "%thisDir%\src\NugetVersion"
-
+rem build .net core packages
+call :buildAndPack "%thisDir%\src\CsProjToVs2017Upgrader"
+call :buildAndPack "%thisDir%\src\NugetVersion"
 exit /b
 
+
+:buildAndPack
+set pDir=%~1
+rem Building %pDir%...
+call "%thisDir%\_build.cmd" "%pDir%"
+if "%errorlevel%" NEQ "0" goto :fail
+rem Creating nuget package...
+call :packProj "%pDir%"
+exit /b %errorlevel%
 
 :packProj
 SETLOCAL
@@ -34,6 +40,9 @@ rem pack it
 pushd "%projDir%"
 call "%NuGet%" pack %projNuSpec% -o "%buildDir%" -NonInteractive %version% -Properties Configuration="%config%"
 popd
+exit /b %errorlevel%
+
+:fail
 exit /b %errorlevel%
 
 ENDLOCAL
