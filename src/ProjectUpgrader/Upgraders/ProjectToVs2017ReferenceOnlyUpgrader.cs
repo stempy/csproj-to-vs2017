@@ -108,8 +108,16 @@ namespace ProjectUpgrader.Upgraders
                     File.Delete(destPackagesConfig);
                 }
             }
+
+            if (refs.Any())
+            {
+                WriteNewCsProjectFile(srcProjectFile, destProjectFile, doc);
+            }
+            else
+            {
+                _log.LogInformation($" no nuget refs to upgrade in {destProjectFile}");
+            }
             
-            WriteNewCsProjectFile(srcProjectFile, destProjectFile, doc);
 
             _log.LogInformation(destProjectFile);
         }

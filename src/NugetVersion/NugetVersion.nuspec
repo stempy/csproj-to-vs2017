@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>NugetVersion</id>
+    <id>NugetVersion.Core</id>
     <version>$version$</version>
     <title>NugetVersion</title>
     <authors>Rob Stemp</authors>
@@ -14,6 +14,10 @@
     <tags>nugetversion</tags>
   </metadata>
   <files>
-    <file src="bin\Release\publishoutput\*.*" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.json" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.dll" target="tools" />
+    <file src="bin\$Configuration$\publishcore\*.exe" target="tools" />
+    <file src="bin\$Configuration$\publishcore\**\*.config" target="tools" />
   </files>
+
 </package>
