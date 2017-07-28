@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>NugetVersion</id>
+    <id>NugetVersion.Core</id>
     <version>$version$</version>
     <title>NugetVersion</title>
     <authors>Rob Stemp</authors>
@@ -13,7 +13,10 @@
     <copyright>Copyright 2017</copyright>
     <tags>nugetversion</tags>
   </metadata>
-  <files>
-    <file src="bin\Release\publishoutput\*.*" target="tools" />
+    <files>
+    <file src="bin\$Configuration$\publishoutput\**\*.dll" target="tools" />
+    <file src="bin\$Configuration$\publishoutput\*.exe" target="tools" />
+    <file src="bin\$Configuration$\publishoutput\**\*.config" target="tools" />
   </files>
+
 </package>

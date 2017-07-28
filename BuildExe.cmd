@@ -1,3 +1,3 @@
 @echo off
 echo Building CsProjToVs2017Upgrader....
-call "%~dp0_buildExe.cmd" "%~dp0src\CsProjToVs2017Upgrader" CsProjToVs2017Upgrader
+call "%~dp0_buildExe.cmd" "%~dp0src\CsProjToVs2017Upgrader"

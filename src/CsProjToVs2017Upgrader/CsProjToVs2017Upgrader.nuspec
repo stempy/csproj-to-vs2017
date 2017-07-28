@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>CsProjToVs2017Upgrader</id>
+    <id>CsProjToVs2017Upgrader.Core</id>
     <version>$version$</version>
     <title>CsProjToVs2017Upgrader</title>
     <authors>Rob Stemp</authors>
@@ -14,6 +14,8 @@
     <tags>CsProjToVs2017Upgrader</tags>
   </metadata>
   <files>
-    <file src="bin\Release\publishoutput\*.*" target="tools" />
+    <file src="bin\$Configuration$\publishoutput\**\*.dll" target="tools" />
+    <file src="bin\$Configuration$\publishoutput\*.exe" target="tools" />
+    <file src="bin\$Configuration$\publishoutput\**\*.config" target="tools" />
   </files>
 </package>
