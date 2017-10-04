@@ -4,7 +4,7 @@ namespace CsProjToVs2017Upgrader
 {
     internal static class PathHelpers
     {
-        public static string GetDestDir(string relativePath = "")
+        public static string GetTempDestDir(string relativePath = "")
         {
             var destDir = Path.Combine(Path.GetTempPath() + Path.DirectorySeparatorChar, "VS2017_Upgrade");
             CreateDirIfNotExist(destDir);
