@@ -7,7 +7,7 @@ namespace ProjectUpgrader.Upgraders
 {
     public class ProjectPackageReferenceXmlHelpers
     {
-        private XNamespace _projectNameSpace = "http://schemas.microsoft.com/developer/msbuild/2003";
+        private readonly XNamespace _projectNameSpace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
         /// <summary>
         /// Makes parsing easier by removing the need to specify namespaces for every element.

@@ -89,6 +89,7 @@ namespace ProjectUpgrader.Upgraders
             foreach(var i in itemGroups)
             {
                 // add as separate itemgroups
+                i.Name = i.Name.LocalName;
                 root.Add(i);
             }
 
@@ -159,23 +160,29 @@ namespace ProjectUpgrader.Upgraders
             return d;
         }
 
+        /// <summary>
+        /// 4/10/2017 RS see: https://www.danielcrabtree.com/blog/314/upgrading-to-net-core-and-net-standard-made-easy
+        /// </summary>
+        /// <param name="oldFwversionString"></param>
+        /// <returns></returns>
         public string UpgradeTargetFramework(string oldFwversionString)
         {
             if (oldFwversionString.StartsWith("v4.6"))
-                return oldFwversionString.Replace("v4", "net4").Replace(".", "");
+                return "netstandard2.0";
 
             switch (oldFwversionString)
             {
                 case "v4.0":
-                    return "net40";
+                    return "netstandard2.0";
                 case "v4.6.1":
-                    return "net461";
+                case "net461":
+                    return "netstandard2.0";
                 case "v4.6.2":
-                    return "net462";
+                    return "netstandard2.0";
                 case "v4.5.2":
-                    return "net452";
+                    return "netstandard2.0";
                 case "v4.5.1":
-                    return "net451";
+                    return "netstandard2.0";
             }
             return oldFwversionString;
         }
