@@ -108,7 +108,13 @@ namespace ProjectUpgrader.Upgraders
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            
+
+            if (File.Exists(destFile))
+            {
+                File.Delete(destFile);
+            }
+
+
             using(var fs = new FileStream(destFile, FileMode.OpenOrCreate))
             {
                 XmlWriterSettings settings = new XmlWriterSettings() {
