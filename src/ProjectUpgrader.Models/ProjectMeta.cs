@@ -31,6 +31,8 @@ namespace ProjectUpgrader.Models
         public ProjectType ProjectType { get; set; }
 
         public string BelongsToSolutionFile { get; set; } = String.Empty;
+        
+        public Exception Exception { get; set; }
 
 
         public IEnumerable<ProjectReference> GetNugetRefs()

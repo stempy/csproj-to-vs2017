@@ -83,6 +83,14 @@ namespace CsProjToVs2017Upgrader
 
         void DisplayProjectInfo(ProjectMeta meta)
         {
+            if (meta.Exception != null)
+            {
+                var aline = $"Project: {Path.GetFileName(meta.ProjectFilePath)} {meta.ProjectName} {meta.AssemblyName} [{meta.ProjectType}-{meta.TargetFrameworkVersion}]";
+                Console.WriteLine(aline+Environment.NewLine+"\t\t"+ meta.Exception);
+                return;
+            }
+            
+            
             var filename = Path.GetFileName(meta.ProjectFilePath);
 
             // C# 7 local function to get reflist string
