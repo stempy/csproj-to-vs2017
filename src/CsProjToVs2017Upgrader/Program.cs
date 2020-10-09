@@ -125,8 +125,16 @@ namespace CsProjToVs2017Upgrader
             // now process csproj files and save to destination instead of overwriting
             foreach (var p in projects)
             {
+                if (p.Exception != null)
+                {
+                    Console.WriteLine($"{p.ProjectFilePath} will not be processed. Exception: {p.Exception.Message}");
+                    continue;
+                }
+                
+                
                 var destProjFile = overwriteSource? p.ProjectFilePath
                                         : PathHelpers.GetFileDestPath(p.ProjectFilePath, destDir);
+
 
                 _refUpgrader.UpgradeProjectFile(p.ProjectFilePath, overwriteSource, destProjFile);
             }
