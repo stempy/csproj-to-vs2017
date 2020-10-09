@@ -22,16 +22,25 @@ namespace ProjectUpgrader.ProjectReader
             {
                 ProjectFilePath = file
             };
-            var content = File.ReadAllText(file);
-            var doc = XDocument.Parse(content);
-            p = InitMetaRoot(p, doc);
+            try
+            {
+                var content = File.ReadAllText(file);
+                var doc = XDocument.Parse(content);
+                p = InitMetaRoot(p, doc);
 
-            p.ProjectReferences = GetProjectReferences(doc, file);
+                p.ProjectReferences = GetProjectReferences(doc, file);
 
-            var legacyPackages = GetPackageReferencesFromPackagesConfigFile(file); // get legacy packages
-            var packageReferencePackages = GetPackageReferencesFromProject(doc, file);
+                var legacyPackages = GetPackageReferencesFromPackagesConfigFile(file); // get legacy packages
+                var packageReferencePackages = GetPackageReferencesFromProject(doc, file);
 
-            p.PackageReferences = legacyPackages.Concat(packageReferencePackages);
+                p.PackageReferences = legacyPackages.Concat(packageReferencePackages);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR: \"{file}\" Exception: {ex.Message}");
+                p.Exception = ex;
+            }
 
             return p;
         }
